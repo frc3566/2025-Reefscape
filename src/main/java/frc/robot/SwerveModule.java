@@ -2,11 +2,11 @@ package frc.robot;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.spark.SparkClosedLoopController;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,8 +15,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.math.OnboardModuleState;
 import frc.lib.util.CANCoderUtil;
 import frc.lib.util.CANCoderUtil.CCUsage;
-import frc.lib.util.CANSparkMaxUtil;
-import frc.lib.util.CANSparkMaxUtil.Usage;
+import frc.lib.util.SparkMaxUtil;
+import frc.lib.util.SparkMaxUtil.Usage;
 import frc.lib.util.SwerveModuleConstants;
 
 public class SwerveModule {
@@ -24,15 +24,15 @@ public class SwerveModule {
     private Rotation2d lastAngle;
     private Rotation2d angleOffset;
 
-    private CANSparkMax angleMotor;
-    private CANSparkMax driveMotor;
+    private SparkMax angleMotor;
+    private SparkMax driveMotor;
 
     private RelativeEncoder driveEncoder;
     private RelativeEncoder integratedAngleEncoder;
     private CANcoder angleEncoder;
 
-    private final SparkPIDController driveController;
-    private final SparkPIDController angleController;
+    private final SparkClosedLoopController driveController;
+    private final SparkClosedLoopController angleController;
 
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
             Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
@@ -46,15 +46,15 @@ public class SwerveModule {
         configAngleEncoder();
 
         /* Angle Motor Config */
-        angleMotor = new CANSparkMax(moduleConstants.angleMotorID, MotorType.kBrushless);
+        angleMotor = new SparkMax(moduleConstants.angleMotorID, MotorType.kBrushless);
         integratedAngleEncoder = angleMotor.getEncoder();
-        angleController = angleMotor.getPIDController();
+        angleController = angleMotor.getClosedLoopController();
         configAngleMotor();
 
         /* Drive Motor Config */
-        driveMotor = new CANSparkMax(moduleConstants.driveMotorID, MotorType.kBrushless);
+        driveMotor = new SparkMax(moduleConstants.driveMotorID, MotorType.kBrushless);
         driveEncoder = driveMotor.getEncoder();
-        driveController = driveMotor.getPIDController();
+        driveController = driveMotor.getClosedLoopController();
         configDriveMotor();
 
         lastAngle = getState().angle;
@@ -90,7 +90,7 @@ public class SwerveModule {
 
     private void configAngleMotor() {
         angleMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(angleMotor, Usage.kPositionOnly);
+        SparkMaxUtil.setSparkMaxBusUsage(angleMotor, Usage.kPositionOnly);
         angleMotor.setSmartCurrentLimit(Constants.Swerve.angleContinuousCurrentLimit);
         angleMotor.setInverted(Constants.Swerve.angleInvert);
         angleMotor.setIdleMode(Constants.Swerve.angleNeutralMode);
@@ -106,7 +106,7 @@ public class SwerveModule {
 
     private void configDriveMotor() {
         driveMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(driveMotor, Usage.kAll);
+        SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
         driveMotor.setSmartCurrentLimit(Constants.Swerve.driveContinuousCurrentLimit);
         driveMotor.setInverted(Constants.Swerve.driveInvert);
         driveMotor.setIdleMode(Constants.Swerve.driveNeutralMode);
