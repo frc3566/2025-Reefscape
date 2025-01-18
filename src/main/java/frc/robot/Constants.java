@@ -2,7 +2,7 @@ package frc.robot;
 
 import java.io.IOException;
 
-import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.studica.frc.AHRS.NavXComType;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
