@@ -1,6 +1,9 @@
 package frc.lib.util;
 
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 
 /** Sets motor usage for a Spark Max motor controller */
@@ -25,31 +28,34 @@ public class SparkMaxUtil {
    *     constructed.
    * @param enableFollowing Whether to enable motor following.
    */
-  public static void setSparkMaxBusUsage(
-      SparkMax motor, Usage usage, boolean enableFollowing) {
+  public static void setSparkMaxBusUsage(SparkMax motor, Usage usage, boolean enableFollowing) {
+    SparkMaxConfig config = new SparkMaxConfig();
+        
     if (enableFollowing) {
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus0, 10);
+      config.signals.outputCurrentPeriodMs(10);
     } else {
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus0, 500);
+      config.signals.outputCurrentPeriodMs(500);
     }
 
     if (usage == Usage.kAll) {
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus1, 20);
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus2, 20);
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus3, 50);
+      config.signals.warningsPeriodMs(20);
+      config.signals.primaryEncoderPositionPeriodMs(20);
+      config.signals.analogPositionPeriodMs(50);
     } else if (usage == Usage.kPositionOnly) {
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus1, 500);
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus2, 20);
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus3, 500);
+      config.signals.warningsPeriodMs(500);
+      config.signals.primaryEncoderPositionPeriodMs(20);
+      config.signals.analogPositionPeriodMs(500);
     } else if (usage == Usage.kVelocityOnly) {
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus1, 20);
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus2, 500);
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus3, 500);
+      config.signals.warningsPeriodMs(20);
+      config.signals.primaryEncoderPositionPeriodMs(500);
+      config.signals.analogPositionPeriodMs(500);
     } else if (usage == Usage.kMinimal) {
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus1, 500);
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus2, 500);
-      motor.setPeriodicFramePeriod(SparkLowLevel.PeriodicFrame.kStatus3, 500);
+      config.signals.warningsPeriodMs(500);
+      config.signals.primaryEncoderPositionPeriodMs(500);
+      config.signals.analogPositionPeriodMs(500);
     }
+
+    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   /**
