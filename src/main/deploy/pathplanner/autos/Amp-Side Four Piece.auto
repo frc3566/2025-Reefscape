@@ -1,0 +1,67 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7,
+      "y": 6.55
+    },
+    "rotation": -120.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp-Side Preload"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PrimeAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp-Side Close 1 Pickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp-Side Close 1 Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PrimeAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp-Side Close 2 Pickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReverseIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PrimeAndShoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
