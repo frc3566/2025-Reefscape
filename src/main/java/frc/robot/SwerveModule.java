@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -177,12 +179,12 @@ public class SwerveModule {
     }
 
     public Rotation2d getCanCoder() {
-        return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
+        return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue().in(Rotations));
     }
 
     public Rotation2d getCanCoderWithUpdate() {
         var posVal = angleEncoder.getAbsolutePosition().waitForUpdate(1);
-        var val = Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
+        var val = Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue().in(Rotations));
         if (posVal.getStatus().isOK()) {
             val = Rotation2d.fromRotations(posVal.getValueAsDouble());
             System.out.println("Success in getting rotation! Angle for posval: "
