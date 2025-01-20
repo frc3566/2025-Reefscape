@@ -4,13 +4,14 @@ import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -35,6 +36,7 @@ public class SwerveModule {
     private SparkMax driveMotor;
 
     private CANcoder angleEncoder;
+    private RelativeEncoder integratedAngleEncoder, driveEncoder;
 
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
             Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
@@ -43,9 +45,8 @@ public class SwerveModule {
         this.moduleNumber = moduleNumber;
         angleOffset = moduleConstants.angleOffset;
 
-        /* Angle Encoder Config */
+        /* Angle Encoder Definition */
         angleEncoder = new CANcoder(moduleConstants.cancoderID);
-        configAngleEncoder();
 
         /* Angle Motor Config */
         angleMotor = new SparkMax(moduleConstants.angleMotorID, MotorType.kBrushless);
@@ -55,14 +56,19 @@ public class SwerveModule {
         driveMotor = new SparkMax(moduleConstants.driveMotorID, MotorType.kBrushless);
         configDriveMotor();
 
+        /* Encoder Config */
+        configEncoders();
+
         lastAngle = getState().angle;
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         // Custom optimize command, since default WPILib optimize assumes continuous
         // controller which REV and CTRE are not
-        desiredState = OnboardModuleState.optimize(desiredState, getState().angle);
 
+        // desiredState = OnboardModuleState.optimize(desiredState, getState().angle);
+        desiredState.optimize(getState().angle);
+        desiredState.cosineScale(getState().angle);
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
@@ -76,14 +82,20 @@ public class SwerveModule {
     }
 
     public void resetToAbsolute() {
-        angleMotor.configAccessor.encoder.setPosition(angleMotor.configAccessor.encoder.getPosition() % 360);
-        angleMotor.configAccessor.encoder.position(getValueWithUpdate());
+        integratedAngleEncoder.setPosition(integratedAngleEncoder.getPosition() % 360);
+        integratedAngleEncoder.setPosition(getValueWithUpdate());
     }
 
-    private void configAngleEncoder() {
+    private void configEncoders() {
         angleEncoder.getConfigurator().apply(new CANcoderConfiguration());
         CANCoderUtil.setCANCoderBusUsage(angleEncoder, CCUsage.kMinimal);
         angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
+
+        driveEncoder = driveMotor.getEncoder();
+        driveEncoder.setPosition(0.0);
+        
+        integratedAngleEncoder = angleMotor.getEncoder();
+        resetToAbsolute();
     }
 
     private void configAngleMotor() {
@@ -101,7 +113,7 @@ public class SwerveModule {
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder) //TODO: remove if causing errors
             .pid(Constants.Swerve.angleKP, Constants.Swerve.angleKI, Constants.Swerve.angleKD);
 
-        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        angleMotor.configure(angleConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
         // angleMotor.restoreFactoryDefaults();
         // SparkMaxUtil.setSparkMaxBusUsage(angleMotor, Usage.kPositionOnly);
@@ -115,7 +127,7 @@ public class SwerveModule {
         // angleController.setFF(Constants.Swerve.angleKFF);
         // angleMotor.enableVoltageCompensation(Constants.Swerve.voltageComp);
         // angleMotor.burnFlash();
-        resetToAbsolute();
+        // resetToAbsolute();
     }
 
     private void configDriveMotor() {
@@ -133,7 +145,7 @@ public class SwerveModule {
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder) //TODO: remove if causing errors
             .pid(Constants.Swerve.driveKP, Constants.Swerve.driveKI, Constants.Swerve.driveKD);
 
-        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
         // driveMotor.restoreFactoryDefaults();
         // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
@@ -148,7 +160,7 @@ public class SwerveModule {
         // driveController.setFF(Constants.Swerve.angleKFF);
         // driveMotor.enableVoltageCompensation(Constants.Swerve.voltageComp);
         // driveMotor.burnFlash();
-        driveEncoder.setPosition(0.0); //TODO: figure replacement out, comment it out after
+        // driveEncoder.setPosition(0.0);
     }
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -156,10 +168,11 @@ public class SwerveModule {
             double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeedMetersPerSecond;
             driveMotor.set(percentOutput);
         } else {
-            driveController.setReference(
+            SparkClosedLoopController controller = angleMotor.getClosedLoopController();
+            controller.setReference(
                     desiredState.speedMetersPerSecond,
                     ControlType.kVelocity,
-                    0,
+                    ClosedLoopSlot.kSlot0,
                     feedforward.calculate(desiredState.speedMetersPerSecond));
         }
     }
@@ -169,8 +182,8 @@ public class SwerveModule {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.maxSpeedMetersPerSecond * 0.01))
                 ? lastAngle
                 : desiredState.angle;
-
-        angleController.setReference(angle.getDegrees(), ControlType.kPosition);
+        SparkClosedLoopController controller = angleMotor.getClosedLoopController();
+        controller.setReference(angle.getDegrees(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
         lastAngle = angle;
     }
 

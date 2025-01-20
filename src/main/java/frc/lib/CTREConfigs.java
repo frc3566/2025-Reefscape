@@ -2,7 +2,6 @@ package frc.lib;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
-import com.ctre.phoenix.sensors.SensorTimeBase;
 
 import frc.robot.Constants;
 
