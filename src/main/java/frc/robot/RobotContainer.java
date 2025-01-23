@@ -56,7 +56,7 @@ public class RobotContainer {
                 s_Swerve, 
                 () -> driver.getRawAxis(leftThumbYID), // translation axis
                 () -> driver.getRawAxis(leftThumbXID), // strafe axis
-                () -> -driver.getRawAxis(rightThumbXID),  // rotation axis
+                () -> driver.getRawAxis(rightThumbXID),  // rotation axis
                 () -> true // always field relative
             )
         );
