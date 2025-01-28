@@ -5,8 +5,10 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.SwerveControlRequestParameters;
+// import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.SwerveControlRequestParameters;
 // import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveControlParameters;
+
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -50,7 +52,7 @@ public class SysIdSwerve extends Swerve {
         this 
     );
 
-    private final SwerveControlRequestParameters controlRequestParameters = new SwerveControlRequestParameters();
+    private final SwerveControlParameters controlRequestParameters = new SwerveControlParameters();
 
     /* set control request parameters */
     public SysIdSwerve() {

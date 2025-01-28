@@ -228,4 +228,8 @@ public class SwerveModule {
     public SparkMax getDriveMotor() {
         return driveMotor; 
     }
+
+    public SparkMax getAngleMotor() {
+        return angleMotor;
+    }
 }
