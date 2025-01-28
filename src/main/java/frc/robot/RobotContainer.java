@@ -1,25 +1,14 @@
 package frc.robot;
 
-import java.util.function.BooleanSupplier;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
-import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.autos.*;
+import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
 /**
@@ -31,55 +20,50 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
     /* Controllers */
     private final Joystick driver = new Joystick(0);
-    private final Joystick driver2 = new Joystick(1);
 
-    /* Joystick Axes */
-    private final int leftThumbXID = XboxController.Axis.kLeftX.value;
-    private final int leftThumbYID = XboxController.Axis.kLeftY.value;
-    private final int rightThumbXID = XboxController.Axis.kRightX.value;
-
-    private final int leftTriggerID = XboxController.Axis.kLeftTrigger.value;
-    private final int rightTriggerID = XboxController.Axis.kRightTrigger.value;
+    /* Drive Controls */
+    private final int translationAxis = XboxController.Axis.kLeftY.value;
+    private final int strafeAxis = XboxController.Axis.kLeftX.value;
+    private final int rotationAxis = XboxController.Axis.kRightX.value;
 
     /* Driver Buttons */
-    private final JoystickButton kX = new JoystickButton(driver, XboxController.Button.kX.value);
-    private final JoystickButton kY = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton resetModules = new JoystickButton(driver, XboxController.Button.kB.value);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
 
-    /** The container for the robot. Contains subsystems, IO devices, and commands. */
+    private Command reset = new reset(s_Swerve);
+
+
+    /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
-                () -> driver.getRawAxis(leftThumbYID), // translation axis
-                () -> driver.getRawAxis(leftThumbXID), // strafe axis
-                () -> driver.getRawAxis(rightThumbXID),  // rotation axis
-                () -> true // always field relative
+                () -> -driver.getRawAxis(translationAxis), 
+                () -> -driver.getRawAxis(strafeAxis), 
+                () -> -driver.getRawAxis(rotationAxis), 
+                () -> robotCentric.getAsBoolean()
             )
         );
 
+        // Configure the button bindings
         configureButtonBindings();
     }
 
     /**
      * Use this method to define your button->command mappings. Buttons can be created by
      * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@c
+     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        kX.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-        kY.onTrue(new InstantCommand(() -> s_Swerve.resetModulesToAbsolute()));
+        zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+        resetModules.onTrue(reset);
     }
-
-    /** 
-     * Use this method to configure PathPlanner settings 
-     * and expose commands to PathPlanner.
-     */
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -87,6 +71,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return null;
+        // An ExampleCommand will run in autonomous
+        return new exampleAuto(s_Swerve);
     }
 }
