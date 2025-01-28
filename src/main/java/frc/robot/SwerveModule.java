@@ -38,6 +38,8 @@ public class SwerveModule {
     private CANcoder angleEncoder;
     private RelativeEncoder integratedAngleEncoder, driveEncoder;
 
+    private int driveMotorID;
+
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
             Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
 
@@ -55,6 +57,7 @@ public class SwerveModule {
         /* Drive Motor Config */
         driveMotor = new SparkMax(moduleConstants.driveMotorID, MotorType.kBrushless);
         configDriveMotor();
+        driveMotorID = moduleConstants.driveMotorID;
 
         /* Encoder Config */
         configEncoders();
@@ -216,5 +219,13 @@ public class SwerveModule {
         return new SwerveModulePosition(
                 driveEncoder.getPosition(),
                 getAngle());
+    }
+
+    public int getDriveMotorID() {
+        return driveMotorID;
+    }
+
+    public SparkMax getDriveMotor() {
+        return driveMotor; 
     }
 }
