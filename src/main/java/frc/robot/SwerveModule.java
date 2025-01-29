@@ -20,6 +20,9 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.lib.math.OnboardModuleState;
 import frc.lib.util.CANCoderUtil;
 import frc.lib.util.CANCoderUtil.CCUsage;
@@ -231,5 +234,9 @@ public class SwerveModule {
 
     public SparkMax getAngleMotor() {
         return angleMotor;
+    }
+
+    public double getAngleSpeed() {
+        return angleEncoder.getVelocity().getValue().in(edu.wpi.first.units.Units.RotationsPerSecond);
     }
 }

@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -14,7 +13,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
@@ -22,6 +23,7 @@ import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Units;
 // import edu.wpi.first.units.measure.Units;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -35,11 +37,11 @@ import frc.robot.SwerveVoltageRequest;
 
 public class SysIdSwerve extends Swerve {
     /* Mutable Measures to keep track of */
-    private final MutVoltage appliedVoltage = MutableMeasure.mutable(Units.Volts.of(0));
-    private final MutDistance distance = MutableMeasure.mutable(Units.Meters.of(0));
-    private final MutLinearVelocity velocity = MutableMeasure.mutable(Units.MetersPerSecond.of(0));
-    private final MutAngle angle = MutableMeasure.mutable(Units.Radians.of(0));
-    private final MutAngularVelocity angularVelocity = MutableMeasure.mutable(Units.RotationsPerSecond.of(0));
+    private final MutVoltage appliedVoltage = Units.Volts.mutable(0);
+    private final MutDistance distance = Units.Meters.mutable(0);
+    private final MutLinearVelocity velocity = Units.MetersPerSecond.mutable(0);
+    private final MutAngle angle = Units.Radians.mutable(0);
+    private final MutAngularVelocity angularVelocity = Units.RotationsPerSecond.mutable(0);
 
     /* Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage. */
     private final SysIdRoutine.Config routineConfig = new SysIdRoutine.Config();
@@ -60,7 +62,7 @@ public class SysIdSwerve extends Swerve {
 
         controlRequestParameters.kinematics = Constants.Swerve.swerveKinematics;
         controlRequestParameters.currentPose = getPose();
-        controlRequestParameters.swervePositions = Arrays.stream(getModulePositions())
+        controlRequestParameters.moduleLocations = Arrays.stream(getModulePositions())
             .map(modulePosition -> new Translation2d(modulePosition.distanceMeters, modulePosition.angle))
             .toArray(size -> new Translation2d[size]);
 
@@ -73,7 +75,7 @@ public class SysIdSwerve extends Swerve {
     private void routineDriving(Voltage volts) {
         appliedVoltage.mut_replace(volts);
         new SwerveVoltageRequest()
-            .withVoltage(volts.in(Volts))
+            .withVoltage(volts.in(Units.Volts))
             .apply(controlRequestParameters, mSwerveMods);
     }
 
