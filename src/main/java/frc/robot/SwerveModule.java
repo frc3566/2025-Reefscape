@@ -10,7 +10,6 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.RelativeEncoder;
@@ -66,9 +65,9 @@ public class SwerveModule {
         // Custom optimize command, since default WPILib optimize assumes continuous
         // controller which REV and CTRE are not
 
-        // desiredState = OnboardModuleState.optimize(desiredState, getState().angle);
-        desiredState.optimize(getState().angle);
-        desiredState.cosineScale(getState().angle);
+        desiredState = OnboardModuleState.optimize(desiredState, getState().angle);
+        // desiredState.optimize(getState().angle); //TODO: Breaks rotation, figure out why
+        // desiredState.cosineScale(getState().angle);
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
@@ -111,7 +110,9 @@ public class SwerveModule {
             .positionConversionFactor(Constants.Swerve.angleConversionFactor);
         angleConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder) //TODO: remove if causing errors
-            .pid(Constants.Swerve.angleKP, Constants.Swerve.angleKI, Constants.Swerve.angleKD);
+            .pidf(Constants.Swerve.angleKP, Constants.Swerve.angleKI, Constants.Swerve.angleKD, Constants.Swerve.angleKFF)
+            .positionWrappingEnabled(true)
+            .positionWrappingInputRange(0,360);
 
         angleMotor.configure(angleConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -143,7 +144,7 @@ public class SwerveModule {
             .positionConversionFactor(Constants.Swerve.driveConversionPositionFactor);
         driveConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder) //TODO: remove if causing errors
-            .pid(Constants.Swerve.driveKP, Constants.Swerve.driveKI, Constants.Swerve.driveKD);
+            .pidf(Constants.Swerve.driveKP, Constants.Swerve.driveKI, Constants.Swerve.driveKD, Constants.Swerve.driveKFF);
 
         driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 

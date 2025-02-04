@@ -17,6 +17,6 @@ public final class CTREConfigs {
               .withSensorDirection(Constants.Swerve.canCoderInvert)
         );
 
-    // swerveCanCoderConfig.sensorTimeBase = SensorTimeBase.PerSecond; TODO: find deprecation replacement
+    // swerveCanCoderConfig.sensorTimeBase = SensorTimeBase.PerSecond; deprecated with no replacement found
   }
 }
