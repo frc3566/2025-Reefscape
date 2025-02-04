@@ -38,21 +38,21 @@ public class SparkMaxUtil {
     }
 
     if (usage == Usage.kAll) {
-      config.signals.warningsPeriodMs(20);
-      config.signals.primaryEncoderPositionPeriodMs(20);
-      config.signals.analogPositionPeriodMs(50);
+      config.signals.primaryEncoderVelocityPeriodMs(20)
+        .primaryEncoderPositionPeriodMs(20)
+        .analogVoltagePeriodMs(50);
     } else if (usage == Usage.kPositionOnly) {
-      config.signals.warningsPeriodMs(500);
-      config.signals.primaryEncoderPositionPeriodMs(20);
-      config.signals.analogPositionPeriodMs(500);
+      config.signals.primaryEncoderVelocityPeriodMs(500)
+        .primaryEncoderPositionPeriodMs(20)
+        .analogVoltagePeriodMs(500);
     } else if (usage == Usage.kVelocityOnly) {
-      config.signals.warningsPeriodMs(20);
-      config.signals.primaryEncoderPositionPeriodMs(500);
-      config.signals.analogPositionPeriodMs(500);
+      config.signals.primaryEncoderVelocityPeriodMs(20)
+        .primaryEncoderPositionPeriodMs(500)
+        .analogVoltagePeriodMs(500);
     } else if (usage == Usage.kMinimal) {
-      config.signals.warningsPeriodMs(500);
-      config.signals.primaryEncoderPositionPeriodMs(500);
-      config.signals.analogPositionPeriodMs(500);
+      config.signals.primaryEncoderVelocityPeriodMs(500)
+        .primaryEncoderPositionPeriodMs(500)
+        .analogVoltagePeriodMs(500);
     }
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
