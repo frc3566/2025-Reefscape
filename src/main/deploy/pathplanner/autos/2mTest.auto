@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Drive Straight"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Drive Back"
+            "pathName": "Test"
           }
         }
       ]

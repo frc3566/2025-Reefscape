@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
+
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.subsystems.*;
 
@@ -87,6 +88,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return null;
+        return new PathPlannerAuto("2mTest");
+        
     }
 }

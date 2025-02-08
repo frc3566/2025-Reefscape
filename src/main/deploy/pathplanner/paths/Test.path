@@ -8,32 +8,27 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.305484999858889,
-        "y": 6.855985827712397
+        "x": 3.5820478978946246,
+        "y": 7.0088725067027005
       },
       "isLocked": false,
-      "linkedName": "Amp-Side Shoot"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.398111106407399,
-        "y": 5.774358766310126
+        "x": 4.0,
+        "y": 7.0
       },
       "prevControl": {
-        "x": 7.11232055334481,
-        "y": 5.6279762744710675
+        "x": 2.840042235324014,
+        "y": 7.001822105584421
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -43,17 +38,17 @@
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
-    "unlimited": false
+    "unlimited": true
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": 0.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

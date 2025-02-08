@@ -8,12 +8,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.studica.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,6 +31,32 @@ public class Swerve extends SubsystemBase {
     public double kPnum = 2.0;
 
     public Swerve() {
+        RobotConfig config = null;
+
+        try{
+            config =  RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            e.printStackTrace();;
+        }
+
+        AutoBuilder.configure(
+            this::getPose,
+            this::resetOdometry,
+            this::getRobotRelativeSpeeds,
+            (speeds) -> driveRobotRelative(speeds),
+            new PPHolonomicDriveController(
+                new PIDConstants(0, 0, 0), 
+                new PIDConstants(0, 0, 0)
+            ),
+            config, 
+            () -> {
+                var alliance = DriverStation.getAlliance();
+                if(alliance.isPresent()){
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
+            }, 
+            this);
         gyro = new AHRS(Constants.Swerve.navXPort);
         zeroGyro();
 
@@ -43,6 +74,9 @@ public class Swerve extends SubsystemBase {
         resetModulesToAbsolute();
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
+    
+    
+    
     }
 
     /**
@@ -165,4 +199,6 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
     }
+
+
 }  
