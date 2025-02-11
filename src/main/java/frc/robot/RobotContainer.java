@@ -1,13 +1,16 @@
 package frc.robot;
 
+import java.util.Arrays;
 import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -47,21 +50,27 @@ public class RobotContainer {
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
+    private final Vision s_Vision = new Vision();
 
     /** The container for the robot. Contains subsystems, IO devices, and commands. */
     public RobotContainer() {
-        
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
-                () -> driver.getRawAxis(leftThumbYID), // translation axis
-                () -> driver.getRawAxis(leftThumbXID), // strafe axis
+                () -> -driver.getRawAxis(leftThumbYID), // translation axis
+                () -> -driver.getRawAxis(leftThumbXID), // strafe axis
                 () -> driver.getRawAxis(rightThumbXID),  // rotation axis
                 () -> true // always field relative
             )
         );
 
         configureButtonBindings();
+    }
+
+    public void updateSimulation() {
+        if (!Robot.isSimulation()) { return; }
+
+        s_Vision.updateSimulation(s_Swerve);
     }
 
     /**

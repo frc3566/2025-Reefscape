@@ -2,11 +2,13 @@ package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
 import frc.robot.Constants;
-
+import frc.robot.Robot;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+
+import java.util.Arrays;
 
 import com.studica.frc.AHRS;
 
@@ -76,6 +78,18 @@ public class Swerve extends SubsystemBase {
 
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+        }
+        
+        if (Robot.isSimulation()) {
+            SwerveModulePosition[] positions = new SwerveModulePosition[4];
+            for(SwerveModule mod : mSwerveMods){
+                positions[mod.moduleNumber] = new SwerveModulePosition(
+                    swerveModuleStates[mod.moduleNumber].speedMetersPerSecond * 0.2, 
+                    swerveModuleStates[mod.moduleNumber].angle
+                );
+            }
+
+            swerveOdometry.update(this.getYaw(), positions);
         }
     }  
     
@@ -157,7 +171,8 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
-        swerveOdometry.update(getYaw(), getModulePositions());  
+        swerveOdometry.update(getYaw(), getModulePositions());
+        System.out.println(this.getPose());
 
         for(SwerveModule mod : mSwerveMods){
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());

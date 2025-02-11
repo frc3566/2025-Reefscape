@@ -2,6 +2,8 @@ package frc.robot;
 
 import java.io.IOException;
 
+import org.photonvision.simulation.SimCameraProperties;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.studica.frc.AHRS.NavXComType;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -97,7 +99,8 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 0;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(162.42);
+            // public static final Rotation2d angleOffset = Rotation2d.fromDegrees(162.42);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(180);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -107,7 +110,8 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 1;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(201.00);
+            // public static final Rotation2d angleOffset = Rotation2d.fromDegrees(201.00);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(180);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -117,7 +121,8 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(61.19);
+            // public static final Rotation2d angleOffset = Rotation2d.fromDegrees(61.19);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -127,10 +132,41 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 3;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(57.04);
+            // public static final Rotation2d angleOffset = Rotation2d.fromDegrees(57.04);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
+    }
+
+    public static final class Vision {
+        public static final String aprilTagCameraName = "Limelight1";
+
+        /** 
+         * For simulation only.
+         * Get properties from https://photonvision.local:5800 
+         */
+        public static final SimCameraProperties cameraProperties = new SimCameraProperties();
+        static {
+            cameraProperties.setCalibration(640, 480, Rotation2d.fromDegrees(74.10));
+            cameraProperties.setCalibError(0.68, 0.08);
+            cameraProperties.setFPS(30);
+            cameraProperties.setAvgLatencyMs(35);
+            cameraProperties.setLatencyStdDevMs(5);
+        }
+
+        /**
+         * Reference coordinate system: 
+         * https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html 
+         */
+        public static final Transform3d robotToCamera = new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(8.75), 
+                Units.inchesToMeters(0.375), 
+                Units.inchesToMeters(12.75)
+            ),
+            new Rotation3d(0, 0, 0)
+        );
     }
 
 }
