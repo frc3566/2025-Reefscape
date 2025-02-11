@@ -20,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SPI.Port;
 import frc.lib.util.SwerveModuleConstants;
+import swervelib.math.Matter;
 
 public final class Constants {
     public static final class Swerve {
@@ -28,6 +29,25 @@ public final class Constants {
         public static final NavXComType navXPort = NavXComType.kMXP_SPI;
         public static final boolean invertGyro = true; // Always ensure Gyro is CCW+ CW-
 
+
+        /* SR Added YAGSL from https://github.com/BroncBotz3481/YAGSL-Example/blob/main/src/main/java/frc/robot/Constants.java */
+        public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
+        public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+        public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
+        public static final double MAX_SPEED  = Units.feetToMeters(14.5);
+
+        /* SR Added to modify rotational speed */
+        public static final double ANGULAR_SPEED_COEFFICIENT  = .05;
+
+        // Joystick Deadband
+        public static final double DEADBAND = 0.1;
+        public static final double LEFT_Y_DEADBAND = 0.1;
+        public static final double RIGHT_X_DEADBAND = 0.1;
+        public static final double TURN_CONSTANT = 6;        
+
+        /**
+         * Most of the constants below are no longer necessary with YAGSL, see the JSON files in main/deploy for constants
+         */
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(24.25);
         public static final double wheelBase = Units.inchesToMeters(24.25);
