@@ -35,6 +35,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import frc.lib.util.RobotLogger;
+import frc.lib.util.RobotLogger.LogLevel;
 import frc.robot.Constants;
 import frc.robot.subsystems.Vision.Cameras;
 import java.io.File;
@@ -58,6 +60,8 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase
 {
+
+  private final RobotLogger logger = new RobotLogger();
 
   /**
    * Swerve drive object.
@@ -414,13 +418,20 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
   {
+    logger.logString(LogLevel.SimulationOnly, "SwerveSubsystem", "Initalizing driveCommand.");
+
     return run(() -> {
+
+      logger.logString(LogLevel.SimulationOnly, "SwerveSubsystem", String.format("Running driveCommand " +
+        "translationX: [ %s ], translationY: [ %s ]" + 
+        "angularRotationX: [ %s ]", translationX.getAsDouble(), translationX.getAsDouble(), angularRotationX.getAsDouble()));
+
       // Make the robot move
       swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
                             translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
                             translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
                         Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
-                        true,
+                        false,
                         false);
     });
   }

@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-
+import frc.lib.util.RobotLogger;
 //import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.subsystems.*;
 import swervelib.SwerveInputStream;
@@ -36,6 +36,8 @@ import swervelib.SwerveInputStream;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    RobotLogger logger = new RobotLogger();
+
     /* Controllers */
     //private final Joystick driver = new Joystick(0);
     //private final Joystick driver2 = new Joystick(1);
@@ -128,7 +130,8 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-
+        logger.logString(RobotLogger.LogLevel.Info, "RobotContainer", "Attempting to configure button bindings");
+        
         /** 
          * SR: Various techniques for driving are defined as Commands below
          * */
@@ -149,10 +152,12 @@ public class RobotContainer {
              * we are experimenting with a call directly to the YAGSL example's driveCommand.
              * TOD: Find out why this blocks rotation while moving with the left stick
              */
-            drivebase.setDefaultCommand(drivebase.driveCommand(
-                () -> driveAngularVelocity.get().vxMetersPerSecond, 
-                () -> driveAngularVelocity.get().vyMetersPerSecond, 
-                () -> driveAngularVelocity.get().omegaRadiansPerSecond * Constants.Swerve.ANGULAR_SPEED_COEFFICIENT));
+            //drivebase.setDefaultCommand(drivebase.driveCommand(
+            //    () -> driveAngularVelocity.get().vxMetersPerSecond, 
+            //    () -> driveAngularVelocity.get().vyMetersPerSecond, 
+            //    () -> driveAngularVelocity.get().omegaRadiansPerSecond * Constants.Swerve.ANGULAR_SPEED_COEFFICIENT));
+
+            drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         } else
         {
             // When not in simulation, use the "driveFieldOrientedAngularVelocity" drive technique
