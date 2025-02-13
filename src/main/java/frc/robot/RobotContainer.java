@@ -43,7 +43,7 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(driverXbox::getRightX)
+      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
@@ -147,7 +147,11 @@ public class RobotContainer {
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.b().whileTrue(
           drivebase.driveToPose(
-              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
+              new Pose2d(new Translation2d(0.5, 0), Rotation2d.fromDegrees(0))));
+
+      // driverXbox.y().whileTrue(
+      //   drivebase.
+      // )
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
