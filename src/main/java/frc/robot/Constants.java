@@ -45,4 +45,9 @@ public final class Constants {
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
   }
+
+  public static class Vision {
+    public static final double xWidth = Units.inchesToMeters(32.5);
+    public static final double yWidth = Units.inchesToMeters(29);
+  }
 }
