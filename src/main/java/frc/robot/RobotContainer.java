@@ -5,9 +5,13 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -18,7 +22,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
+import frc.robot.commands.vision.DriveToReef;
+import frc.robot.commands.vision.DriveToReef.LeftRight;
+import frc.robot.commands.vision.SupplyAprilTagPose;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.VisionSubsystem;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -38,6 +47,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
+
+  private final VisionSubsystem vision = new VisionSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -147,17 +158,38 @@ public class RobotContainer {
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      // driverXbox.b().whileTrue(
-      //     drivebase.driveToPose(
-      //         new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0))));
+    //   driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+    //   // driverXbox.b().whileTrue(
+    //   //     drivebase.driveToPose(
+    //   //         new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0))));
 
       driverXbox.y().whileTrue(
-        new Spin(this.drivebase, () -> new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)))
+        new DriveToReef(this.drivebase, this.vision, LeftRight.LEFT)
+        // Commands.runOnce(() -> {
+        //   new Vision(() -> this.drivebase.getPose(), this.drivebase.getSwerveDrive().field).printAllResults();
+        // })
       );
 
+      double multiplier = 1;
+      double adjustY = Units.inchesToMeters(6.469);
+      double robotXWidth = Constants.Vision.xWidth;
+
       driverXbox.b().whileTrue(
-        new Drive(this.drivebase, () -> new Pose2d(new Translation2d(0.5, 0), Rotation2d.fromDegrees(0)))
+        new SupplyAprilTagPose(vision, new Pose2d(), (pose) -> {
+                Pose2d targetPose;
+                targetPose = new Pose2d(
+                    pose.getTranslation().minus(
+                        new Translation2d(
+                            robotXWidth * 3 / 4,
+                            adjustY * multiplier
+                        ).rotateBy(pose.getRotation())
+                    ),
+                    pose.getRotation()
+                );
+
+                System.out.println(targetPose);
+            }, DriveToReef::getTargettingIds)
+        // new Drive(this.drivebase, () -> new Pose2d(new Translation2d(0.5, 0), Rotation2d.fromDegrees(0)))
       );
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
@@ -180,4 +212,10 @@ public class RobotContainer {
   public void setMotorBrake(boolean brake) {
     drivebase.setMotorBrake(brake);
   }
+
+  public void updateSimulation() {
+    if (!Robot.isSimulation()) { return; }
+
+    vision.updateSimulation(this.drivebase);
+}
 }

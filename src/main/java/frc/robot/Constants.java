@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import org.photonvision.simulation.SimCameraProperties;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -49,5 +54,31 @@ public final class Constants {
   public static class Vision {
     public static final double xWidth = Units.inchesToMeters(32.5);
     public static final double yWidth = Units.inchesToMeters(29);
+
+    /** 
+     * For simulation only.
+     * Get properties from https://photonvision.local:5800 
+     */
+    public static final SimCameraProperties cameraProperties = new SimCameraProperties();
+    static {
+        cameraProperties.setCalibration(640, 480, Rotation2d.fromDegrees(74.10));
+        cameraProperties.setCalibError(0.68, 0.08);
+        cameraProperties.setFPS(30);
+        cameraProperties.setAvgLatencyMs(35);
+        cameraProperties.setLatencyStdDevMs(5);
+    }
+
+    /**
+     * Reference coordinate system: 
+     * https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html 
+     */
+    public static final Transform3d robotToCamera = new Transform3d(
+        new Translation3d(
+            Units.inchesToMeters(14.5),
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(13.5)
+        ),
+        new Rotation3d(0, 0, 0)
+    );
   }
 }

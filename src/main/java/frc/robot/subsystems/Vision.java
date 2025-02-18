@@ -48,7 +48,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
  * from
  * https://gitlab.com/ironclad_code/ironclad-2024/-/blob/master/src/main/java/frc/robot/vision/Vision.java?ref_type=heads
  */
-public class Vision extends SubsystemBase {
+public class Vision {
 
   /**
    * April Tag Field Layout of the year.
@@ -97,7 +97,7 @@ public class Vision extends SubsystemBase {
         c.addToVisionSim(visionSim);
       }
 
-      openSimCameraViews();
+      // openSimCameraViews();
     }
   }
 
@@ -276,6 +276,7 @@ public class Vision extends SubsystemBase {
 
   public void printAllResults() {
     System.out.println("Vision log:");
+    Cameras.MAIN.updateUnreadResults();
     var result = Cameras.MAIN.getLatestResult();
 
     if (result.isEmpty() || !result.get().hasTargets()) {
@@ -300,9 +301,9 @@ public class Vision extends SubsystemBase {
     MAIN("Limelight1",
         new Rotation3d(0, 0, 0),
         new Translation3d(
-          Units.inchesToMeters(8.75),
-          Units.inchesToMeters(0.375),
-          Units.inchesToMeters(12.75)
+          Units.inchesToMeters(14.5),
+          Units.inchesToMeters(0),
+          Units.inchesToMeters(13.5)
         ),
         VecBuilder.fill(0.1, 0.1, 0.1), VecBuilder.fill(0.5, 0.5, 1));
     
@@ -464,7 +465,7 @@ public class Vision extends SubsystemBase {
      * Update the latest results, cached with a maximum refresh rate of 1req/15ms.
      * Sorts the list by timestamp.
      */
-    private void updateUnreadResults() {
+    public void updateUnreadResults() {
       double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
       double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
       double debounceTime = Milliseconds.of(15).in(Seconds);

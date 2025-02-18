@@ -25,6 +25,7 @@ import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.VisionSubsystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
     }
 
     private final SwerveSubsystem swerve;
-    private final Vision vision;
+    private final VisionSubsystem vision;
     private final LeftRight side;
 
     private List<Command> commandsWithStatus;
@@ -48,20 +49,13 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
 
     private Pose2d targetPose = new Pose2d();
 
-    public DriveToReef(SwerveSubsystem swerve, Vision vision, LeftRight side) {
+    public DriveToReef(SwerveSubsystem swerve, VisionSubsystem vision, LeftRight side) {
         this.swerve = swerve;
         this.vision = vision;
 
         this.side = side;
 
-        List<Integer> targettingIds;
-        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
-            targettingIds = List.of(17, 18, 19, 20, 21, 22);
-        } else {
-            targettingIds = List.of(6, 7, 8, 9, 10, 11);
-        }
-
-        double multiplier = side == LeftRight.LEFT ? -1 : 1;
+        double multiplier = side == LeftRight.LEFT ? 1 : -1;
         double robotXWidth = Constants.Vision.xWidth;
 
         commandsWithStatus = List.of(
@@ -69,13 +63,15 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
                 targetPose = new Pose2d(
                     pose.getTranslation().minus(
                         new Translation2d(
-                            robotXWidth * 3 / 4,
-                            adjustY * multiplier
-                        )
+                            robotXWidth * 5 / 8,
+                            -adjustY * multiplier
+                        ).rotateBy(pose.getRotation())
                     ),
                     pose.getRotation()
                 );
-            }, targettingIds),
+
+                System.out.println(targetPose);
+            }, DriveToReef::getTargettingIds),
             new Drive(swerve, () -> targetPose),
             new Spin(swerve, () -> targetPose)
         );
@@ -91,5 +87,13 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
             if (!(command instanceof WithStatus)) { throw new Error("Command " + command.getName() + " does not implement WithStatus"); }
             return (WithStatus) command;
         }).anyMatch(WithStatus::isRunning);
+    }
+
+    public static List<Integer> getTargettingIds() {
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
+            return List.of(17, 18, 19, 20, 21, 22);
+        } else {
+            return List.of(6, 7, 8, 9, 10, 11);
+        }
     }
 }
