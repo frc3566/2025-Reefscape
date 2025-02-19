@@ -137,7 +137,7 @@ public class RobotContainer {
     Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
     if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     } else {
       drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     }
@@ -151,7 +151,7 @@ public class RobotContainer {
       drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity); // Overrides drive command above!
 
       driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
       driverXbox.leftBumper().onTrue(Commands.none());
@@ -175,7 +175,7 @@ public class RobotContainer {
       double robotXWidth = Constants.Vision.xWidth;
 
       driverXbox.b().whileTrue(
-        new SupplyAprilTagPose(vision, new Pose2d(), (pose) -> {
+        new SupplyAprilTagPose(vision, () -> drivebase.getPose(), (pose) -> {
                 Pose2d targetPose;
                 targetPose = new Pose2d(
                     pose.getTranslation().minus(
