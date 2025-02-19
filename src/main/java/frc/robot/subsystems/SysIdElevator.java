@@ -1,95 +1,122 @@
 package frc.robot.subsystems;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveControlParameters;
+import frc.robot.Constants;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.*;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Units;
-// import edu.wpi.first.units.measure.Units;
-import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants;
-import frc.robot.SwerveModule;
-import frc.robot.SwerveVoltageRequest;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Millimeters;
+import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
-public class SysIdElevator extends Elevator {
-    /* Mutable Measures to keep track of */
-    private final MutVoltage appliedVoltage = Units.Volts.mutable(0);
-    private final MutDistance distance = Units.Meters.mutable(0);
-    private final MutLinearVelocity velocity = Units.MetersPerSecond.mutable(0);
-    private final MutAngle angle = Units.Radians.mutable(0);
-    private final MutAngularVelocity angularVelocity = Units.RotationsPerSecond.mutable(0);
-
-    /* Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage. */
-    private final SysIdRoutine.Config routineConfig = new SysIdRoutine.Config();
-
-    private final SysIdRoutine.Mechanism routineMechanism = new SysIdRoutine.Mechanism(
-        this::routineSetVoltage,
-        this::routineLogging,
-        this
-    );
-
-    /* set control request parameters */
+public class SysIdElevator extends SubsystemBase {
+    private final MutVoltage        m_appliedVoltage = Volts.mutable(0);
+    private final MutDistance       m_distance       = Meters.mutable(0);
+    private final MutAngle          m_rotations      = Rotations.mutable(0);
+    private final MutLinearVelocity m_velocity       = MetersPerSecond.mutable(0);
+    private  SparkMax m_motor = new SparkMax(10, MotorType.kBrushless); // Use one motor as the main one
+    private  SparkMax followerMotor = new SparkMax(11, MotorType.kBrushless);
+    private  RelativeEncoder m_encoder =  m_motor.getEncoder();
+    private  ProfiledPIDController m_controller = new ProfiledPIDController
+          ( 0, //All placeholders for now
+            0,
+            0,
+            new Constraints(0,0)); //TODO: constants
+        
     public SysIdElevator() {
-        super();
+        /* Setting up the motors and PID*/
+        SparkMaxConfig primaryConfig = getMotorConfig(false);
+        SparkMaxConfig followerConfig = getMotorConfig(false);
+        followerConfig.follow(m_motor, false);
 
-        // this.encoder.setDistancePerPulse(Constants.Shooter.kEncoderDistancePerPulse);
+        m_motor.configure(primaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        followerMotor.configure(followerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    }
+    
+    public void setVoltage(double volt) {
+        m_motor.setVoltage(volt);
     }
 
-    /* Tell SysId how to feed voltage to elevator motors */
-    private void routineSetVoltage(Voltage volts) {
-        appliedVoltage.mut_replace(volts);
-        // this.setVoltage(
-        //     volts.in(Units.Volts)
-        // );
+    private SysIdRoutine      m_sysIdRoutine   =
+        new SysIdRoutine(
+            // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage. 
+            new SysIdRoutine.Config(Volts.per(Second).of(1),
+                                    Volts.of(7),
+                                    Seconds.of(10)),
+            new SysIdRoutine.Mechanism(
+                // Tell SysId how to plumb the driving voltage to the motor(s).
+                m_motor::setVoltage,
+                // Tell SysId how to record a frame of data for each motor on the mechanism being
+                // characterized.
+                log -> {
+                    // Record a frame for the shooter motor.
+                    log.motor("elevator")
+                    .voltage(
+                        m_appliedVoltage.mut_replace(
+                            m_motor.getAppliedOutput() * RobotController.getBatteryVoltage(), Volts))
+                    .linearPosition(m_distance.mut_replace(getHeightMeters(),
+                                                            Meters)) // Records Height in Meters via SysIdRoutineLog.linearPosition
+                    .linearVelocity(m_velocity.mut_replace(getVelocityMetersPerSecond(),
+                                                            MetersPerSecond)); // Records velocity in MetersPerSecond via SysIdRoutineLog.linearVelocity
+                },
+                this));
+
+    private SparkMaxConfig getMotorConfig(boolean isInverted) {
+        // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
+        SparkMaxConfig motorConfig = new SparkMaxConfig();
+        motorConfig
+            .smartCurrentLimit(20)
+            .inverted(isInverted)
+            .idleMode(IdleMode.kBrake);
+        return motorConfig;
+        }
+    /* Calculations */
+    public double getHeightMeters(){ //TODO: constants
+        // return (m_encoder.getPosition() / ElevatorConstants.kElevatorGearing) *
+        // (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius);
+        return 0.0;
     }
 
-    /* Tell SysId how to record a frame of data for each motor on the mechanism being characterized. */
-    private void routineLogging(SysIdRoutineLog log) {
-        /* Record a frame for every module. 
-            Since each motor in a module shares an encoder, we consider the entire group to be one motor. */
-
-        // Record a frame for the shooter motor.
-        // log.motor("shooter-wheel")
-        //     .voltage(appliedVoltage.mut_replace(
-        //         this.motor.get() * RobotController.getBatteryVoltage(), 
-        //         Units.Volts))
-        //     .angularPosition(angle.mut_replace(this.encoder.getDistance(), Units.Rotations))
-        //     .angularVelocity(velocity.mut_replace(this.encoder.getRate(), Units.RotationsPerSecond));
+    public double getVelocityMetersPerSecond(){ //TODO: constants
+    //   return ((.getVelocity() / 60)/ ElevatorConstants.kElevatorGearing) *
+    //          (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius);
+        return 0.0;
     }
 
-    public SysIdRoutine getRoutine() {
-        return new SysIdRoutine(
-            routineConfig,
-            routineMechanism
-        );
+    public Distance getLinearPosition(){
+        return convertRotationsToDistance(Rotations.of(m_encoder.getPosition()));
     }
 
-    public Command sysIdQuasistatic(Direction kforward) {
-        return getRoutine().quasistatic(kforward);
-    }
-
-    public Command sysIdDynamic(Direction kforward) {
-        return getRoutine().dynamic(kforward);
+    public static Distance convertRotationsToDistance(Angle rotations) { //TODO: constants
+    //   return Meters.of((rotations.in(Rotations) / ElevatorConstants.kElevatorGearing) *
+    //                    (ElevatorConstants.kElevatorDrumRadius * 2 * Math.PI));
+    // }
+    return Meters.of(0);
     }
 }
