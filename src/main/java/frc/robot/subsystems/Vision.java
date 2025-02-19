@@ -142,6 +142,7 @@ public class Vision {
     }
     for (Cameras camera : Cameras.values()) {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+      poseEst = filterPose(poseEst);
       if (poseEst.isPresent()) {
         var pose = poseEst.get();
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
@@ -149,7 +150,29 @@ public class Vision {
             camera.curStdDevs);
       }
     }
+  }
 
+  private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose) {
+    if (pose.isEmpty()) { return pose; }
+
+    var bestTargetAmbiguity = pose.get().targetsUsed.stream()
+      .map(target -> target.getPoseAmbiguity())
+      .min(Double::compare);
+
+    if (bestTargetAmbiguity.orElse(1.0) > maximumAmbiguity) { return Optional.empty(); }
+
+    // estimated pose is very far from recorded robot pose
+    if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1) {
+      longDistangePoseEstimationCount++;
+
+      // if it calculates that we're, say, 10 meter away for more than 50 times in a row its probably maybe potentially right 
+      if (longDistangePoseEstimationCount < 50) {
+        return Optional.empty();
+      }
+    } else {
+      longDistangePoseEstimationCount = 0;
+    }
+    return pose;
   }
 
   /**
