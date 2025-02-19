@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.TargetingSystem;
 import frc.robot.Constants;
@@ -58,22 +59,34 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
         double multiplier = side == LeftRight.LEFT ? 1 : -1;
         double robotXWidth = Constants.Vision.xWidth;
 
-        commandsWithStatus = List.of(
-            new SupplyAprilTagPose(vision, new Pose2d(), (pose) -> {
-                targetPose = new Pose2d(
-                    pose.getTranslation().minus(
-                        new Translation2d(
-                            robotXWidth * 5 / 8,
-                            -adjustY * multiplier
-                        ).rotateBy(pose.getRotation())
-                    ),
-                    pose.getRotation()
-                );
+        var visionCommand = new SupplyAprilTagPose(this.vision, () -> swerve.getPose(), (pose) -> {
+            var targetPoseDelta = new Pose2d(
+                pose.getTranslation().minus(
+                    new Translation2d(
+                        robotXWidth * 5 / 8,
+                        -adjustY * multiplier
+                    ).rotateBy(pose.getRotation())
+                ),
+                pose.getRotation()
+            );
 
-                System.out.println(targetPose);
-            }, DriveToReef::getTargettingIds),
-            new Drive(swerve, () -> targetPose),
-            new Spin(swerve, () -> targetPose)
+            var robotPose = this.swerve.getPose();
+            targetPose = new Pose2d(robotPose.getTranslation().plus(targetPoseDelta.getTranslation()), 
+                robotPose.getRotation().rotateBy(targetPoseDelta.getRotation()));
+
+            System.out.println("> targetPoseDelta: " + targetPoseDelta);
+            System.out.println("> targetPose: " + targetPose);
+        }, DriveToReef::getTargettingIds);
+
+        commandsWithStatus = List.of(
+            visionCommand,
+            // SR: We need to defer this since the setting of targetPose is asynchrnous
+            new DeferredCommand(() -> this.swerve.driveToPose(targetPose), getRequirements())
+
+            // SR: Disabled these commands
+            // SR: TODO: Do we need to spin if we're too close for pathplanner to work?
+            // new Drive(this.swerve, () -> targetPose),
+            // new Spin(this.swerve, () -> targetPose)
         );
 
         addCommands(

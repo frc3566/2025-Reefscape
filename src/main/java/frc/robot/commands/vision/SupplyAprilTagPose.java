@@ -25,11 +25,13 @@ public class SupplyAprilTagPose extends Command implements WithStatus {
     public static final int MAX_CYCLE_COUNT = 10;
 
     public final Supplier<List<Integer>> targetIds;
+    private Supplier<Pose2d> currentPose;
 
-    public SupplyAprilTagPose(VisionSubsystem s_Vision, Pose2d currentPose, Consumer<Pose2d> setTargetPose, Supplier<List<Integer>> targetIds) {
+    public SupplyAprilTagPose(VisionSubsystem s_Vision, Supplier<Pose2d> currentRobotPose, Consumer<Pose2d> setTargetPose, Supplier<List<Integer>> targetIds) {
         this.s_Vision = s_Vision;
         this.setTargetPose = setTargetPose;
         this.targetIds = targetIds;
+        this.currentPose = currentRobotPose;
 
         System.out.println(targetIds);
 
@@ -56,7 +58,7 @@ public class SupplyAprilTagPose extends Command implements WithStatus {
         
         if (result.isEmpty()) {
             counter += 1;
-            System.out.println("Cycle: " + counter);
+            //System.out.println("Cycle: " + counter);
             return;
         }
 
@@ -71,6 +73,7 @@ public class SupplyAprilTagPose extends Command implements WithStatus {
 
         Pose2d poseToAprilTag = s_Vision.getPoseTo(target);
         System.out.println("> April Tag: " + poseToAprilTag);
+        System.out.println("> currentPose: " + currentPose.get());
 
         setTargetPose.accept(poseToAprilTag);
         targetPoseSet = true;
