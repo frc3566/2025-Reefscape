@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import java.awt.Desktop;
 import java.util.ArrayList;
@@ -118,6 +119,20 @@ public class Vision {
       throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
     }
 
+  }
+
+  /** 
+   * @return the Pose2d from robot center to AprilTag target
+   */
+  public static Pose2d getRobotRelativePoseTo(PhotonTrackedTarget target) {
+      Transform3d transform = target.getBestCameraToTarget();
+      Translation2d end = transform.getTranslation().toTranslation2d()
+          .plus(Constants.Vision.robotToCamera.getTranslation().toTranslation2d());
+
+      double zAngleTheta = transform.getRotation().getZ();
+      Rotation2d yaw = Rotation2d.fromRadians(Math.signum(zAngleTheta) * (Math.PI - Math.abs(zAngleTheta))).unaryMinus();
+
+      return new Pose2d(end, yaw);
   }
 
   /**
@@ -285,16 +300,6 @@ public class Vision {
     }
 
     field2d.getObject("tracked targets").setPoses(poses);
-  }
-
-  public Pose2d getPoseTo(PhotonTrackedTarget target) {
-    Transform3d transform = target.getBestCameraToTarget();
-    Translation2d end = transform.getTranslation().toTranslation2d();
-
-    double zAngleTheta = transform.getRotation().getZ();
-    Rotation2d yaw = Rotation2d.fromRadians(Math.signum(zAngleTheta) * (Math.PI - Math.abs(zAngleTheta))).unaryMinus();
-
-    return new Pose2d(end, yaw);
   }
 
   public void printAllResults() {

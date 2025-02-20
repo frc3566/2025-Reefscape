@@ -11,10 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.commands.WithStatus;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.VisionSubsystem;
 
 public class SupplyAprilTagPose extends Command implements WithStatus {
-    private VisionSubsystem s_Vision;
     
     private Consumer<Pose2d> setTargetPose;
 
@@ -26,14 +24,11 @@ public class SupplyAprilTagPose extends Command implements WithStatus {
 
     public final Supplier<List<Integer>> targetIds;
 
-    public SupplyAprilTagPose(VisionSubsystem s_Vision, Pose2d currentPose, Consumer<Pose2d> setTargetPose, Supplier<List<Integer>> targetIds) {
-        this.s_Vision = s_Vision;
+    public SupplyAprilTagPose(Pose2d currentPose, Consumer<Pose2d> setTargetPose, Supplier<List<Integer>> targetIds) {
         this.setTargetPose = setTargetPose;
         this.targetIds = targetIds;
 
         System.out.println(targetIds);
-
-        addRequirements(s_Vision);
     }
 
     @Override
@@ -69,7 +64,7 @@ public class SupplyAprilTagPose extends Command implements WithStatus {
             return;
         }
 
-        Pose2d poseToAprilTag = s_Vision.getPoseTo(target);
+        Pose2d poseToAprilTag = Vision.getRobotRelativePoseTo(target);
         System.out.println("> April Tag: " + poseToAprilTag);
 
         setTargetPose.accept(poseToAprilTag);

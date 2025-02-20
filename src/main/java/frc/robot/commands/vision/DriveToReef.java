@@ -25,7 +25,6 @@ import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.VisionSubsystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +39,6 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
     }
 
     private final SwerveSubsystem swerve;
-    private final VisionSubsystem vision;
     private final LeftRight side;
 
     private List<Command> commandsWithStatus;
@@ -49,9 +47,8 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
 
     private Pose2d targetPose = new Pose2d();
 
-    public DriveToReef(SwerveSubsystem swerve, VisionSubsystem vision, LeftRight side) {
+    public DriveToReef(SwerveSubsystem swerve, LeftRight side) {
         this.swerve = swerve;
-        this.vision = vision;
 
         this.side = side;
 
@@ -59,7 +56,7 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
         double robotXWidth = Constants.Vision.xWidth;
 
         commandsWithStatus = List.of(
-            new SupplyAprilTagPose(vision, new Pose2d(), (pose) -> {
+            new SupplyAprilTagPose(new Pose2d(), (pose) -> {
                 targetPose = new Pose2d(
                     pose.getTranslation().minus(
                         new Translation2d(

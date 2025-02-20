@@ -27,7 +27,6 @@ import frc.robot.commands.vision.DriveToReef.LeftRight;
 import frc.robot.commands.vision.SupplyAprilTagPose;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.VisionSubsystem;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -47,8 +46,6 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
-
-  private final VisionSubsystem vision = new VisionSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -164,7 +161,7 @@ public class RobotContainer {
     //   //         new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0))));
 
       driverXbox.y().whileTrue(
-        new DriveToReef(this.drivebase, this.vision, LeftRight.LEFT)
+        new DriveToReef(this.drivebase, LeftRight.LEFT)
         // Commands.runOnce(() -> {
         //   new Vision(() -> this.drivebase.getPose(), this.drivebase.getSwerveDrive().field).printAllResults();
         // })
@@ -175,7 +172,7 @@ public class RobotContainer {
       double robotXWidth = Constants.Vision.xWidth;
 
       driverXbox.b().whileTrue(
-        new SupplyAprilTagPose(vision, new Pose2d(), (pose) -> {
+        new SupplyAprilTagPose(new Pose2d(), (pose) -> {
                 Pose2d targetPose;
                 targetPose = new Pose2d(
                     pose.getTranslation().minus(
@@ -215,7 +212,6 @@ public class RobotContainer {
 
   public void updateSimulation() {
     if (!Robot.isSimulation()) { return; }
-
-    vision.updateSimulation(this.drivebase);
-}
+    this.drivebase.vision.visionSim.update(this.drivebase.getPose());
+  }
 }
