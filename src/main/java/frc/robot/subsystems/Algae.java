@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 
+import frc.robot.Constants.OperatorConstants;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -12,13 +13,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
-public class Elevator extends SubsystemBase {
+public class Algae extends SubsystemBase {
     public SparkMax left, right;
-    public double speed = 0.2;
+    public double speed = OperatorConstants.AlgaeSpeed;
 
-    public Elevator() {
-        left = new SparkMax(10, MotorType.kBrushless);
-        right = new SparkMax(11, MotorType.kBrushless);
+    public Algae() {
+        left = new SparkMax(12, MotorType.kBrushless);
+        right = new SparkMax(13, MotorType.kBrushless);
         left.configure(getMotorConfig(true), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         right.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -29,8 +30,8 @@ public class Elevator extends SubsystemBase {
     }
 
     public void down() {
-        left.set(-speed);
-        right.set(-speed);
+        left.set(-speed*2);
+        right.set(-speed*2);
     }
 
     public void stop() {
@@ -62,7 +63,7 @@ private SparkMaxConfig getMotorConfig(boolean isInverted) {
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(20)
         .inverted(isInverted)
         .idleMode(IdleMode.kBrake);
     return motorConfig;
