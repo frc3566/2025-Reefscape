@@ -124,7 +124,7 @@ public class Vision {
   /** 
    * @return the Pose2d from robot center to AprilTag target
    */
-  public static Pose2d getRobotRelativePoseTo(PhotonTrackedTarget target) {
+  public static Transform2d getRobotRelativeTransformTo(PhotonTrackedTarget target) {
       Transform3d transform = target.getBestCameraToTarget();
       Translation2d end = transform.getTranslation().toTranslation2d()
           .plus(Constants.Vision.robotToCamera.getTranslation().toTranslation2d());
@@ -132,7 +132,7 @@ public class Vision {
       double zAngleTheta = transform.getRotation().getZ();
       Rotation2d yaw = Rotation2d.fromRadians(Math.signum(zAngleTheta) * (Math.PI - Math.abs(zAngleTheta))).unaryMinus();
 
-      return new Pose2d(end, yaw);
+      return new Transform2d(end, yaw);
   }
 
   /**

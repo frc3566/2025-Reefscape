@@ -6,25 +6,25 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import frc.robot.Constants;
 import frc.robot.commands.WithStatus;
 import frc.robot.subsystems.Vision;
 
-public class SupplyAprilTagPose extends Command implements WithStatus {
-    
+public class SupplyAprilTagFieldPose extends Command implements WithStatus {
     private Consumer<Pose2d> setTargetPose;
 
     private int counter = 0;
-    private boolean targetPoseSet = false;
+    private boolean targetSet = false;
     private boolean isRunning = false;
 
     public static final int MAX_CYCLE_COUNT = 10;
 
     public final Supplier<List<Integer>> targetIds;
 
-    public SupplyAprilTagPose(Pose2d currentPose, Consumer<Pose2d> setTargetPose, Supplier<List<Integer>> targetIds) {
+    public SupplyAprilTagFieldPose(Consumer<Pose2d> setTargetPose, Supplier<List<Integer>> targetIds) {
         this.setTargetPose = setTargetPose;
         this.targetIds = targetIds;
 
@@ -33,21 +33,19 @@ public class SupplyAprilTagPose extends Command implements WithStatus {
 
     @Override
     public void initialize() {
-        targetPoseSet = false;
+        targetSet = false;
         isRunning = true;
         counter = 0;
     }
 
-    /* TODO: take currentPose into account */
     @Override
     public void execute() {
-        if (targetPoseSet) { return; }
+        if (targetSet) { return; }
 
         if (counter > MAX_CYCLE_COUNT) { this.cancel(); }
         
         Vision.Cameras.MAIN.updateUnreadResults();
         var result = Vision.Cameras.MAIN.getLatestResult();
-        // var result = s_Vision.getAprilTag();
         
         if (result.isEmpty()) {
             counter += 1;
@@ -55,20 +53,15 @@ public class SupplyAprilTagPose extends Command implements WithStatus {
             return;
         }
 
-        // s_Vision.printAllResults();
-
         var target = result.get().getBestTarget();
         if (!result.get().hasTargets()) { return; }
-        // var target = result.get();
-        if (!targetIds.get().contains(target.getFiducialId())) {
-            return;
-        }
+        if (!targetIds.get().contains(target.getFiducialId())) { return; }
 
-        Pose2d poseToAprilTag = Vision.getRobotRelativePoseTo(target);
-        System.out.println("> April Tag: " + poseToAprilTag);
+        Pose2d aprilTagPoseOnField = Vision.getAprilTagPose(target.getFiducialId(), new Transform2d());
+        System.out.println("> April Tag: " + aprilTagPoseOnField);
 
-        setTargetPose.accept(poseToAprilTag);
-        targetPoseSet = true;
+        setTargetPose.accept(aprilTagPoseOnField);
+        targetSet = true;
     }
 
     @Override
@@ -78,7 +71,7 @@ public class SupplyAprilTagPose extends Command implements WithStatus {
 
     @Override
     public boolean isFinished() {
-        return targetPoseSet;
+        return targetSet;
     }
 
     @Override

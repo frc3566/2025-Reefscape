@@ -22,9 +22,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
-import frc.robot.commands.vision.DriveToReef;
-import frc.robot.commands.vision.DriveToReef.LeftRight;
-import frc.robot.commands.vision.SupplyAprilTagPose;
+import frc.robot.commands.vision.DriveToReefAbsolute;
+import frc.robot.commands.vision.DriveToReefRelative;
+import frc.robot.commands.vision.ReefUtils;
+import frc.robot.commands.vision.SupplyAprilTagRobotTransform;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
@@ -160,34 +161,31 @@ public class RobotContainer {
     //   //     drivebase.driveToPose(
     //   //         new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0))));
 
-      driverXbox.y().whileTrue(
-        new DriveToReef(this.drivebase, LeftRight.LEFT)
-        // Commands.runOnce(() -> {
-        //   new Vision(() -> this.drivebase.getPose(), this.drivebase.getSwerveDrive().field).printAllResults();
-        // })
-      );
+      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtils.LeftRight.LEFT));
+      driverXbox.b().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtils.LeftRight.LEFT));
 
-      double multiplier = 1;
-      double adjustY = Units.inchesToMeters(6.469);
-      double robotXWidth = Constants.Vision.xWidth;
+      // double multiplier = 1;
+      // double adjustY = Units.inchesToMeters(6.469);
+      // double robotXWidth = Constants.Vision.xWidth;
 
-      driverXbox.b().whileTrue(
-        new SupplyAprilTagPose(new Pose2d(), (pose) -> {
-                Pose2d targetPose;
-                targetPose = new Pose2d(
-                    pose.getTranslation().minus(
-                        new Translation2d(
-                            robotXWidth * 3 / 4,
-                            adjustY * multiplier
-                        ).rotateBy(pose.getRotation())
-                    ),
-                    pose.getRotation()
-                );
+      // driverXbox.b().whileTrue(
+      //   new SupplyAprilTagRobotTransform((pose) -> {
+      //       Pose2d targetPose;
+      //       targetPose = new Pose2d(
+      //           pose.getTranslation().minus(
+      //               new Translation2d(
+      //                   robotXWidth * 3 / 4,
+      //                   adjustY * multiplier
+      //               ).rotateBy(pose.getRotation())
+      //           ),
+      //           pose.getRotation()
+      //       );
 
-                System.out.println(targetPose);
-            }, DriveToReef::getTargettingIds)
-        // new Drive(this.drivebase, () -> new Pose2d(new Translation2d(0.5, 0), Rotation2d.fromDegrees(0)))
-      );
+      //       System.out.println(targetPose);
+      //   }, DriveToReefRelative::getTargettingIds)
+      //   // new Drive(this.drivebase, () -> new Pose2d(new Translation2d(0.5, 0), Rotation2d.fromDegrees(0)))
+      // );
+
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());

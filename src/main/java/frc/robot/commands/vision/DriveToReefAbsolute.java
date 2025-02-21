@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.TargetingSystem;
 import frc.robot.Constants;
@@ -23,6 +24,7 @@ import frc.robot.FieldConstants.ReefHeight;
 import frc.robot.commands.WithStatus;
 import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
+import frc.robot.commands.vision.ReefUtils.LeftRight;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
@@ -33,11 +35,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class DriveToReef extends SequentialCommandGroup implements WithStatus {
-    public enum LeftRight {
-        LEFT, RIGHT
-    }
-
+public class DriveToReefAbsolute extends SequentialCommandGroup implements WithStatus {
     private final SwerveSubsystem swerve;
     private final LeftRight side;
 
@@ -47,30 +45,26 @@ public class DriveToReef extends SequentialCommandGroup implements WithStatus {
 
     private Pose2d targetPose = new Pose2d();
 
-    public DriveToReef(SwerveSubsystem swerve, LeftRight side) {
+    public DriveToReefAbsolute(SwerveSubsystem swerve, LeftRight side) {
         this.swerve = swerve;
-
         this.side = side;
 
         double multiplier = side == LeftRight.LEFT ? 1 : -1;
         double robotXWidth = Constants.Vision.xWidth;
 
         commandsWithStatus = List.of(
-            new SupplyAprilTagPose(new Pose2d(), (pose) -> {
-                targetPose = new Pose2d(
-                    pose.getTranslation().minus(
-                        new Translation2d(
-                            robotXWidth * 5 / 8,
-                            -adjustY * multiplier
-                        ).rotateBy(pose.getRotation())
-                    ),
+            new SupplyAprilTagFieldPose((pose) -> {
+                targetPose = pose.transformBy(new Transform2d(
+                    new Translation2d(
+                        -robotXWidth * 5 / 8,
+                        adjustY * multiplier
+                    ).unaryMinus(), 
                     pose.getRotation()
-                );
+                ));
 
                 System.out.println(targetPose);
-            }, DriveToReef::getTargettingIds),
-            new Drive(swerve, () -> targetPose),
-            new Spin(swerve, () -> targetPose)
+            }, ReefUtils::getTargettingIds),
+            new InstantCommand(() -> swerve.driveToPose(targetPose).schedule())
         );
 
         addCommands(
