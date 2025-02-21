@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.TargetingSystem;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,7 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
 
     private List<Command> commandsWithStatus;
 
-    double adjustY = Units.inchesToMeters(6.469);
+    final double adjustY = Units.inchesToMeters(6.469);
 
     private Pose2d targetPose = new Pose2d();
 
@@ -56,15 +58,15 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
             new SupplyAprilTagFieldPose((pose) -> {
                 targetPose = pose.transformBy(new Transform2d(
                     new Translation2d(
-                        -robotXWidth * 5 / 8,
-                        adjustY * multiplier
-                    ).unaryMinus(), 
-                    pose.getRotation()
+                        robotXWidth,
+                        -adjustY * multiplier
+                    ).unaryMinus().rotateBy(pose.getRotation().unaryMinus()), 
+                    Rotation2d.k180deg
                 ));
 
                 System.out.println(targetPose);
             }, ReefUtils::getTargettingIds),
-            new InstantCommand(() -> swerve.driveToPose(targetPose).schedule())
+            new DeferredCommand(() -> swerve.driveToPose(targetPose), Set.of(swerve))
         );
 
         addCommands(
@@ -74,10 +76,11 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
 
     @Override
     public boolean isRunning() {
-        return commandsWithStatus.stream().map(command -> {
-            if (!(command instanceof WithStatus)) { throw new Error("Command " + command.getName() + " does not implement WithStatus"); }
-            return (WithStatus) command;
-        }).anyMatch(WithStatus::isRunning);
+        throw new RuntimeException("Not implemented");
+        // return commandsWithStatus.stream().map(command -> {
+        //     if (!(command instanceof WithStatus)) { throw new Error("Command " + command.getName() + " does not implement WithStatus"); }
+        //     return (WithStatus) command;
+        // }).anyMatch(WithStatus::isRunning);
     }
 
     public static List<Integer> getTargettingIds() {
