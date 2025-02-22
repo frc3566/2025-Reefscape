@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.SysIdPivot;
 import frc.robot.subsystems.SysIdSwerve;
+import frc.robot.subsystems.SysIdElevator;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,6 +25,7 @@ public class RobotRoutine {
   // The robot's subsystems
   private final SysIdSwerve m_drive = new SysIdSwerve();
   private final SysIdPivot m_Pivot = new SysIdPivot();
+  private final SysIdElevator m_Elevator = new SysIdElevator();
 
   // The driver's controller
   CommandXboxController m_driverController =
@@ -65,10 +67,10 @@ public class RobotRoutine {
     // m_driverController.x().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // m_driverController.y().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    m_driverController.a().whileTrue(m_Pivot.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    m_driverController.b().whileTrue(m_Pivot.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    m_driverController.x().whileTrue(m_Pivot.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController.y().whileTrue(m_Pivot.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    m_driverController.a().whileTrue(m_Elevator.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    m_driverController.b().whileTrue(m_Elevator.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    m_driverController.x().whileTrue(m_Elevator.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    m_driverController.y().whileTrue(m_Elevator.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**

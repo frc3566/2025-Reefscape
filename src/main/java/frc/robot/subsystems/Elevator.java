@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
 public class Elevator extends SubsystemBase {
     public SparkMax left, right;
-    public AbsoluteEncoder leftAbsoluteEncoder = left.getAbsoluteEncoder();
-    public AbsoluteEncoder rightAbsoluteEncoder = right.getAbsoluteEncoder();
+    public AbsoluteEncoder leftAbsoluteEncoder;
+    public AbsoluteEncoder rightAbsoluteEncoder;
     public double speed = 0.5;
 
     public Elevator() {
@@ -24,6 +24,8 @@ public class Elevator extends SubsystemBase {
         right = new SparkMax(11, MotorType.kBrushless);
         left.configure(getMotorConfig(true), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         right.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        leftAbsoluteEncoder = left.getAbsoluteEncoder();
+        rightAbsoluteEncoder = right.getAbsoluteEncoder();
     }
 
     public void up() {
