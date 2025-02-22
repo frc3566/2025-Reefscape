@@ -44,17 +44,6 @@ public class Elevator extends SubsystemBase {
         right.setVoltage(volt);
     }
 
-// private SysIdRoutine getSysIdRoutine(){
-//     SysIdRoutine sysid = new SysIdRoutine(
-//             new SysIdRoutine.Config(),
-//             new SysIdRoutine.Mechanism(
-//                 this::voltageDrive, 
-//                 this::logMotors, 
-//                 this
-//             )
-//         );
-// }
-
 private SparkMaxConfig getMotorConfig(boolean isInverted) {
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
     SparkMaxConfig motorConfig = new SparkMaxConfig();

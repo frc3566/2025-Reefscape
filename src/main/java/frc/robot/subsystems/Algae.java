@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
 public class Algae extends SubsystemBase {
     public SparkMax left, right;
-    public double speed = Constants.ALGAE_SPEED;
+    public double inSpeed = Constants.ALGAE_IN_SPEED;
+    public double outSpeed = Constants.ALGAE_OUT_SPEED;
 
     public Algae() {
         left = new SparkMax(12, MotorType.kBrushless);
@@ -24,14 +25,14 @@ public class Algae extends SubsystemBase {
         right.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public void up() {
-        left.set(speed);
-        right.set(speed);
+    public void in() {
+        left.set(inSpeed);
+        right.set(inSpeed);
     }
 
-    public void down() {
-        left.set(-speed*2);
-        right.set(-speed*2);
+    public void out() {
+        left.set(-outSpeed); // negate speed to go out
+        right.set(-outSpeed);
     }
 
     public void stop() {
@@ -43,17 +44,6 @@ public class Algae extends SubsystemBase {
         left.setVoltage(volt);
         right.setVoltage(volt);
     }
-
-// private SysIdRoutine getSysIdRoutine(){
-//     SysIdRoutine sysid = new SysIdRoutine(
-//             new SysIdRoutine.Config(),
-//             new SysIdRoutine.Mechanism(
-//                 this::voltageDrive, 
-//                 this::logMotors, 
-//                 this
-//             )
-//         );
-// }
 
 private SparkMaxConfig getMotorConfig(boolean isInverted) {
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);

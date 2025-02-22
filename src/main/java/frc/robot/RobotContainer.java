@@ -18,7 +18,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.*;
+
 import java.io.File;
 import swervelib.SwerveInputStream;
 
@@ -38,6 +39,9 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
   private final Climber climber = new Climber();
+  private final Elevator elevator = new Elevator();
+  private final Algae algae = new Algae();
+  private final Intake intake = new Intake();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -146,22 +150,44 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      // driverXbox.a().onTrue(new InstantCommand(() -> climber.down()));
-      // driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
-      // driverXbox.x().onTrue(new InstantCommand(() -> climber.up()));
-      // driverXbox.x().onFalse(new InstantCommand(() -> climber.stop()));
+      // TELEOP HERE
+      // TODO: Refactor with suppliers?
 
-      driverXbox.b().whileTrue(
-          drivebase.driveToPose(
-              new Pose2d(new Translation2d(0.5, 0), Rotation2d.fromDegrees(0))));
+      /* Buttons - Climb / Gyro */
+      driverXbox.y().onTrue(new InstantCommand(() -> climber.up()));
+      driverXbox.y().onFalse(new InstantCommand(() -> climber.stop()));
 
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().whileTrue(Commands.none());
+      driverXbox.a().onTrue(new InstantCommand(() -> climber.down()));
+      driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
 
+      driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
+
+      /* Bumpers - Pivot */
+      driverXbox.leftBumper().onTrue(new InstantCommand(() -> intake.down()));
+      driverXbox.leftBumper().onFalse(new InstantCommand(() -> intake.stopPivot()));
+      
+      driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.up()));
+      driverXbox.rightBumper().onFalse(new InstantCommand(() -> intake.stopPivot()));
+ 
+      /* Triggers - Elevator */
+      driverXbox.leftTrigger().onTrue(new InstantCommand(() -> elevator.down()));
+      driverXbox.leftTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
+
+      driverXbox.rightTrigger().onTrue(new InstantCommand(() -> elevator.up()));
+      driverXbox.rightTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
+
+      /* DPad - Coral / Algae */
+      driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral out
+      driverXbox.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
+
+      driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
+      driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
+
+      driverXbox.povLeft().onTrue(new InstantCommand(() -> algae.in())); 
+      driverXbox.povLeft().onFalse(new InstantCommand(() -> algae.stop()));
+
+      driverXbox.povRight().onTrue(new InstantCommand(() -> algae.out())); 
+      driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
     }
   }
 

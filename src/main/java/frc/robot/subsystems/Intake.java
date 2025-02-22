@@ -24,15 +24,22 @@ public class Intake extends SubsystemBase{
         pivot.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public void run(boolean in){
+    public void runIntake(boolean in){
         intake.set(in ? intakeSpeed : -intakeSpeed);
+    }
+
+    public void up(){
+        pivot.set(pivotSpeed);
+    }
+    public void down(){
+        pivot.set(-(pivotSpeed));
     }
 
     public void stopIntake(){
         intake.stopMotor();
     }
 
-    public void stopRotation(){
+    public void stopPivot(){
         pivot.stopMotor();
     }
 
@@ -40,7 +47,7 @@ public class Intake extends SubsystemBase{
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
-        .smartCurrentLimit(20)
+        .smartCurrentLimit(40)
         .inverted(isInverted)
         .idleMode(IdleMode.kBrake);
     return motorConfig;
