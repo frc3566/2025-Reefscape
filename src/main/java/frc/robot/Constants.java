@@ -22,6 +22,11 @@ public final class Constants {
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
   public static final double MAX_SPEED  = Units.feetToMeters(14.5);
+  public static final double ALGAE_SPEED    = 0.2;
+  public static final double CLIMBER_SPEED  = 0.2;
+  public static final double ELEVATOR_SPEED  = 0.2;
+  public static final double INTAKE_SPEED  = 0.4;
+  public static final double PIVOT_SPEED  = 1;
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants
@@ -35,6 +40,8 @@ public final class Constants {
 
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 10; // seconds
+
+
   }
 
   public static class OperatorConstants {
@@ -44,5 +51,6 @@ public final class Constants {
     public static final double LEFT_Y_DEADBAND = 0.1;
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
+
   }
 }

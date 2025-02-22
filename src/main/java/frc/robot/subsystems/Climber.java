@@ -1,22 +1,21 @@
 package frc.robot.subsystems;
 
 
-import frc.robot.Constants;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import frc.robot.Constants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase{
     public SparkMax motor;
-    public double speed = 0.1;
+    public double speed = Constants.CLIMBER_SPEED; 
 
     public Climber() {
-        motor = new SparkMax(9, MotorType.kBrushless);
+        motor = new SparkMax(9, MotorType.kBrushless); //TODO: add to constants
         motor.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -25,7 +24,7 @@ public class Climber extends SubsystemBase{
     }
 
     public void down() {
-        motor.set(speed);
+        motor.set(-speed);
     }
 
     public void stop() {
