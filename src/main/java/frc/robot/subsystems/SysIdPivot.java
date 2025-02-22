@@ -32,7 +32,7 @@ import frc.robot.Constants;
 import frc.robot.SwerveModule;
 import frc.robot.SwerveVoltageRequest;
 
-public class SysIdElevator extends Elevator {
+public class SysIdPivot extends Intake {
     /* Mutable Measures to keep track of */
     private final MutVoltage appliedVoltage = Units.Volts.mutable(0);
     private final MutDistance distance = Units.Meters.mutable(0);
@@ -50,7 +50,7 @@ public class SysIdElevator extends Elevator {
     );
 
     /* set control request parameters */
-    public SysIdElevator() {
+    public SysIdPivot() {
         super();
 
         // this.encoder.setDistancePerPulse(Constants.Shooter.kEncoderDistancePerPulse);
@@ -70,18 +70,12 @@ public class SysIdElevator extends Elevator {
             Since each motor in a module shares an encoder, we consider the entire group to be one motor. */
 
         // Record a frame for the shooter motor.
-        log.motor("left_elevator")
+        log.motor("pivot")
             .voltage(appliedVoltage.mut_replace(
-                this.getLeft().get() * RobotController.getBatteryVoltage(), 
+                Intake.pivot.get() * RobotController.getBatteryVoltage(), 
                 Units.Volts))
-            .angularPosition(angle.mut_replace(this.getLeftAbsoluteEncoder().getPosition(), Units.Rotations))
-            .angularVelocity(angularVelocity.mut_replace(this.getLeftAbsoluteEncoder().getVelocity(), Units.RotationsPerSecond));
-        log.motor("right_elevator")
-            .voltage(appliedVoltage.mut_replace(
-                this.getRight().get() * RobotController.getBatteryVoltage(), 
-                Units.Volts))
-            .angularPosition(angle.mut_replace(this.getRightAbsoluteEncoder().getPosition(), Units.Rotations))
-            .angularVelocity(angularVelocity.mut_replace(this.getRightAbsoluteEncoder().getVelocity(), Units.RotationsPerSecond));
+            .angularPosition(angle.mut_replace(Intake.getRotRelativeEncoder().getPosition(), Units.Rotations))
+            .angularVelocity(angularVelocity.mut_replace(Intake.getRotRelativeEncoder().getVelocity(), Units.RotationsPerSecond));
     }
 
     public SysIdRoutine getRoutine() {

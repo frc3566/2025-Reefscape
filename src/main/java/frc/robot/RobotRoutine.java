@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.subsystems.SysIdPivot;
 import frc.robot.subsystems.SysIdSwerve;
 
 /**
@@ -22,6 +23,7 @@ import frc.robot.subsystems.SysIdSwerve;
 public class RobotRoutine {
   // The robot's subsystems
   private final SysIdSwerve m_drive = new SysIdSwerve();
+  private final SysIdPivot m_Pivot = new SysIdPivot();
 
   // The driver's controller
   CommandXboxController m_driverController =
@@ -58,10 +60,15 @@ public class RobotRoutine {
     //     );
 
     // Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
-    m_driverController.a().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    m_driverController.b().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    m_driverController.x().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController.y().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // m_driverController.a().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // m_driverController.b().whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // m_driverController.x().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // m_driverController.y().whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    m_driverController.a().whileTrue(m_Pivot.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    m_driverController.b().whileTrue(m_Pivot.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    m_driverController.x().whileTrue(m_Pivot.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    m_driverController.y().whileTrue(m_Pivot.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
