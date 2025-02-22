@@ -146,12 +146,12 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
-      // driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.a().onTrue(new InstantCommand(() -> climber.down()));
-      driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
-      // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.x().onTrue(new InstantCommand(() -> climber.up()));
-      driverXbox.x().onFalse(new InstantCommand(() -> climber.stop()));
+      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      // driverXbox.a().onTrue(new InstantCommand(() -> climber.down()));
+      // driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
+      // driverXbox.x().onTrue(new InstantCommand(() -> climber.up()));
+      // driverXbox.x().onFalse(new InstantCommand(() -> climber.stop()));
 
       driverXbox.b().whileTrue(
           drivebase.driveToPose(

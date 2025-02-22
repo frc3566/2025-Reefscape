@@ -24,14 +24,6 @@ public class Intake extends SubsystemBase{
         pivot.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public void up(){
-        pivot.set(pivotSpeed);
-    }
-
-    public void down(){
-        pivot.set(-pivotSpeed);
-    }
-
     public void run(boolean in){
         intake.set(in ? intakeSpeed : -intakeSpeed);
     }

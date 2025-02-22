@@ -39,11 +39,7 @@ public class Algae extends SubsystemBase {
         right.stopMotor();
     }
 
-    public void zeroPower(){
-        left.set(0);
-        right.set(0);
-    }
-    public void voltageDrive(double volt) {
+    public void setVoltage(double volt) {
         left.setVoltage(volt);
         right.setVoltage(volt);
     }
