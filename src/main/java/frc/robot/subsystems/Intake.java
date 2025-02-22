@@ -42,6 +42,10 @@ public class Intake extends SubsystemBase{
         public void stopRotation(){
             pivot.stopMotor();
         }
+
+        public void voltagePivot(double volt){
+            pivot.setVoltage(volt);
+        }
     
         public static RelativeEncoder getRotRelativeEncoder(){
             return rotationEncoder;

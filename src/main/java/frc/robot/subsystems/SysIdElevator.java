@@ -59,9 +59,9 @@ public class SysIdElevator extends Elevator {
     /* Tell SysId how to feed voltage to elevator motors */
     private void routineSetVoltage(Voltage volts) {
         appliedVoltage.mut_replace(volts);
-        // this.setVoltage(
-        //     volts.in(Units.Volts)
-        // );
+        this.voltageDrive(
+            volts.in(Units.Volts)
+        );
     }
 
     /* Tell SysId how to record a frame of data for each motor on the mechanism being characterized. */
