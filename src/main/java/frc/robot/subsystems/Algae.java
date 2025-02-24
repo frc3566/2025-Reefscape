@@ -21,8 +21,8 @@ public class Algae extends SubsystemBase {
     public Algae() {
         left = new SparkMax(12, MotorType.kBrushless);
         right = new SparkMax(13, MotorType.kBrushless);
-        left.configure(getMotorConfig(true), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        right.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        left.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        right.configure(getMotorConfig(true), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void in() {

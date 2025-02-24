@@ -19,12 +19,12 @@ public class Climber extends SubsystemBase{
         motor.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public void up() {
+    public void down() {
         motor.set(speed);
     }
 
-    public void down() {
-        motor.set(-speed);
+    public void up() {
+        motor.set(-speed*0.5);
     }
 
     public void stop() {
@@ -35,7 +35,7 @@ private SparkMaxConfig getMotorConfig(boolean isInverted) {
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
-        .smartCurrentLimit(20)
+        .smartCurrentLimit(40)
         .inverted(isInverted)
         .idleMode(IdleMode.kBrake);
     return motorConfig;
