@@ -16,13 +16,17 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -40,6 +44,7 @@ public class SysIdElevator extends SubsystemBase {
     private final MutDistance       m_distance       = Meters.mutable(0);
     private final MutAngle          m_rotations      = Rotations.mutable(0);
     private final MutLinearVelocity m_velocity       = MetersPerSecond.mutable(0);
+    private final MutAngularVelocity m_angularVelocity = RotationsPerSecond.mutable(0);
     private  SparkMax m_motor = new SparkMax(10, MotorType.kBrushless); // Use one motor as the main one
     private  SparkMax followerMotor = new SparkMax(11, MotorType.kBrushless);
     private  RelativeEncoder m_encoder =  m_motor.getEncoder();
@@ -80,10 +85,10 @@ public class SysIdElevator extends SubsystemBase {
                     .voltage(
                         m_appliedVoltage.mut_replace(
                             m_motor.getAppliedOutput() * RobotController.getBatteryVoltage(), Volts))
-                    .linearPosition(m_distance.mut_replace(getHeightMeters(),
-                                                            Meters)) // Records Height in Meters via SysIdRoutineLog.linearPosition
-                    .linearVelocity(m_velocity.mut_replace(getVelocityMetersPerSecond(),
-                                                            MetersPerSecond)); // Records velocity in MetersPerSecond via SysIdRoutineLog.linearVelocity
+                    .angularPosition(m_rotations.mut_replace(m_encoder.getPosition(),
+                                                            Rotations)) // Records Height in Meters via SysIdRoutineLog.linearPosition
+                    .angularVelocity(m_angularVelocity.mut_replace(m_encoder.getVelocity()/60,
+                                                            RotationsPerSecond)); // Records velocity in MetersPerSecond via SysIdRoutineLog.linearVelocity
                 },
                 this));
 
@@ -96,27 +101,41 @@ public class SysIdElevator extends SubsystemBase {
             .idleMode(IdleMode.kBrake);
         return motorConfig;
         }
+
+    public Command runQuasistatic(boolean forward){
+        if(forward){
+            return m_sysIdRoutine.quasistatic(Direction.kForward);
+        }
+        return m_sysIdRoutine.quasistatic(Direction.kReverse);
+    }
+
+    public Command runDynamic(boolean forward){
+        if(forward){
+            return m_sysIdRoutine.dynamic(Direction.kForward);
+        }
+        return m_sysIdRoutine.dynamic(Direction.kReverse);
+    } 
     /* Calculations */
-    public double getHeightMeters(){ //TODO: constants
-        // return (m_encoder.getPosition() / ElevatorConstants.kElevatorGearing) *
-        // (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius);
-        return 0.0;
-    }
-
-    public double getVelocityMetersPerSecond(){ //TODO: constants
-    //   return ((.getVelocity() / 60)/ ElevatorConstants.kElevatorGearing) *
-    //          (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius);
-        return 0.0;
-    }
-
-    public Distance getLinearPosition(){
-        return convertRotationsToDistance(Rotations.of(m_encoder.getPosition()));
-    }
-
-    public static Distance convertRotationsToDistance(Angle rotations) { //TODO: constants
-    //   return Meters.of((rotations.in(Rotations) / ElevatorConstants.kElevatorGearing) *
-    //                    (ElevatorConstants.kElevatorDrumRadius * 2 * Math.PI));
+    // public double getHeightMeters(){ //TODO: constants
+    //     return (m_encoder.getPosition() / kElevatorGearing) *
+    //     (2 * Math.PI * kElevatorDrumRadius);
+    //     return 0.0;
     // }
-    return Meters.of(0);
-    }
+
+    // public double getVelocityMetersPerSecond(){ //TODO: constants
+    //     return ((m_encoder.getVelocity() / 60)/ kElevatorGearing) *
+    //          (2 * Math.PI * kElevatorDrumRadius);
+    //     return 0.0;
+    // }
+
+    // public Distance getLinearPosition(){
+    //     return convertRotationsToDistance(Rotations.of(m_encoder.getPosition()));
+    // }
+
+    // public static Distance convertRotationsToDistance(Angle rotations) { //TODO: constants
+    //   return Meters.of((rotations.in(Rotations) / kElevatorGearing) *
+    //                    (kElevatorDrumRadius * 2 * Math.PI));
+    // // }
+    // return Meters.of(0);
+    // }
 }

@@ -7,12 +7,11 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase{
     public SparkMax motor;
-    public double speed = OperatorConstants.ClimberSpeed; 
+    public double speed = 0.5; 
 
     public Climber() {
         motor = new SparkMax(9, MotorType.kBrushless); //TODO: add to constants
@@ -35,7 +34,7 @@ private SparkMaxConfig getMotorConfig(boolean isInverted) {
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
-        .smartCurrentLimit(20)
+        .smartCurrentLimit(50)
         .inverted(isInverted)
         .idleMode(IdleMode.kBrake);
     return motorConfig;

@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-
-import frc.robot.Constants.OperatorConstants;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -15,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
 public class Algae extends SubsystemBase {
     public SparkMax left, right;
-    public double speed = OperatorConstants.AlgaeSpeed;
+    public double speed = 0.5;
 
     public Algae() {
         left = new SparkMax(12, MotorType.kBrushless);
