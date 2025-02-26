@@ -28,6 +28,10 @@ public class Intake extends SubsystemBase{
         intake.set(in ? intakeSpeed : -intakeSpeed);
     }
 
+    public void set(double speed){
+        pivot.set(speed);
+    }
+
     public void up(){
         pivot.set(pivotSpeed);
     }
@@ -43,6 +47,10 @@ public class Intake extends SubsystemBase{
         pivot.stopMotor();
     }
 
+    public double getPivotDegree(){
+        return pivot.getEncoder().getPosition();
+    }
+
     private SparkMaxConfig getMotorConfig(boolean isInverted) {
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
@@ -50,6 +58,27 @@ public class Intake extends SubsystemBase{
         .smartCurrentLimit(40)
         .inverted(isInverted)
         .idleMode(IdleMode.kBrake);
+    motorConfig.encoder
+        .positionConversionFactor(360.0/(81.0/1.0));
+    motorConfig.closedLoop
+        .pid(0, 0, 0);
     return motorConfig;
     }
+
+    // private void getAngleMotorConfig() {
+
+    //     SparkMaxUtil.setSparkMaxBusUsage(angleMotor, Usage.kPositionOnly);
+    //     SparkMaxConfig angleConfig = new SparkMaxConfig();
+    //     angleConfig
+    //         .smartCurrentLimit(Constants.Swerve.angleContinuousCurrentLimit)
+    //         .inverted(Constants.Swerve.angleInvert)
+    //         .idleMode(Constants.Swerve.angleNeutralMode)
+    //         .voltageCompensation(Constants.Swerve.voltageComp);
+    //     angleConfig.encoder
+    //         .positionConversionFactor(Constants.Swerve.angleConversionFactor);
+    //     angleConfig.closedLoop
+    //         .feedbackSensor(FeedbackSensor.kPrimaryEncoder) //TODO: remove if causing errors
+    //         .pid(Constants.Swerve.angleKP, Constants.Swerve.angleKI, Constants.Swerve.angleKD);
+
+    //     angleMotor.configure(angleConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 }
