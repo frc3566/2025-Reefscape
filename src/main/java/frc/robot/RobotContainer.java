@@ -154,13 +154,16 @@ public class RobotContainer {
       // TELEOP HERE
       // TODO: Refactor with suppliers?
 
+      driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
+      driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
+
       /* Buttons - Climb / Gyro */
-      driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
+      // driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
 
-      driverXbox.a().onTrue(new InstantCommand(() -> climber.up()));
-      driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
+      // driverXbox.a().onTrue(new InstantCommand(() -> climber.up()));
+      // driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
 
-      driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
+      // driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
       /* Bumpers - Pivot */
       driverXbox.leftBumper().onTrue(new InstantCommand(() -> intake.down()));
