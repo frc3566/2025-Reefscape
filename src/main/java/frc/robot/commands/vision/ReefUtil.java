@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
-public class ReefUtils {
+public class ReefUtil {
     public enum LeftRight {
         LEFT, RIGHT
     }

@@ -1,4 +1,4 @@
-package frc.robot.commands.vision;
+package frc.robot.commands.swervedrive.auto;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -25,7 +25,9 @@ import frc.robot.FieldConstants.ReefHeight;
 import frc.robot.commands.WithStatus;
 import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
-import frc.robot.commands.vision.ReefUtils.LeftRight;
+import frc.robot.commands.vision.ReefUtil;
+import frc.robot.commands.vision.SupplyAprilTagFieldPose;
+import frc.robot.commands.vision.ReefUtil.LeftRight;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
@@ -65,7 +67,7 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
                 ));
 
                 System.out.println(targetPose);
-            }, ReefUtils::getTargettingIds),
+            }, ReefUtil::getTargettingIds),
             new DeferredCommand(() -> swerve.driveToPose(targetPose), Set.of(swerve))
         );
 

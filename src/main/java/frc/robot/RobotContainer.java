@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.config.PIDConstants;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -17,19 +19,22 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.swervedrive.auto.DriveToReefAbsolute;
+import frc.robot.commands.swervedrive.auto.DriveToReefRelative;
 import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
-import frc.robot.commands.vision.DriveToReefAbsolute;
-import frc.robot.commands.vision.DriveToReefRelative;
-import frc.robot.commands.vision.ReefUtils;
+import frc.robot.commands.vision.ReefUtil;
 import frc.robot.commands.vision.SupplyAprilTagRobotTransform;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
 import java.io.File;
+import java.util.function.BooleanSupplier;
+
 import swervelib.SwerveInputStream;
 
 /**
@@ -135,7 +140,7 @@ public class RobotContainer {
     Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
     if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocityKeyboard);
     } else {
       drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     }
@@ -161,8 +166,17 @@ public class RobotContainer {
     //   //     drivebase.driveToPose(
     //   //         new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0))));
 
-      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtils.LeftRight.LEFT));
-      driverXbox.b().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtils.LeftRight.LEFT));
+      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      driverXbox.b().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
+
+      driverXbox.x().whileTrue(new InstantCommand(() -> {
+        System.out.println("pressed x");
+        Vision.Cameras.MAIN.updateUnreadResults();
+        Vision.Cameras.MAIN.getLatestResult()
+          .map(e -> (e.hasTargets() ? e.getBestTarget() : null))
+          .map(Vision::getRobotRelativeTransformTo)
+          .ifPresent(System.out::println);
+      }).repeatedly());
 
       // double multiplier = 1;
       // double adjustY = Units.inchesToMeters(6.469);
@@ -212,4 +226,40 @@ public class RobotContainer {
     if (!Robot.isSimulation()) { return; }
     this.drivebase.vision.visionSim.update(this.drivebase.getPose());
   }
+
+   /** 
+     * Use this method to configure PathPlanner settings 
+     * and expose commands to PathPlanner.
+     */
+    private void configurePathPlanner() {
+        var translationPID = new PIDConstants(4.0, 0.0, 0.0);
+        var rotationPID = new PIDConstants(6.0, 0.0, 0.0);
+        var centerToFurthestModule = (Math.sqrt(Constants.Vision.xWidth) + Math.sqrt(Constants.Vision.yWidth)) / 2;
+
+        var config = new HolonomicPathFollowerConfig(
+            translationPID,
+            rotationPID,
+            Constants.AutoConstants.kMaxSpeedMetersPerSecond, 
+            centerToFurthestModule, 
+            new ReplanningConfig() 
+        );
+
+        /* Paths should be flipped if we are on Red Alliance side */
+        BooleanSupplier shouldFlipPath = () -> { return DriverStation.getAlliance().orElse(null) == DriverStation.Alliance.Red; };
+
+        AutoBuilder.configureHolonomic(
+            drivebase::getPose, 
+            drivebase::resetOdometry, 
+            drivebase::getRobotRelativeSpeeds, 
+            drivebase::driveRobotRelative, 
+            config,
+            shouldFlipPath,
+            drivebase
+        );
+
+        /* Register PathPlanner commands here */
+        // NamedCommands.registerCommand("PrimeAndShoot", new PrimeAndShoot(s_Shooter, s_Intake, 1.0));
+        // NamedCommands.registerCommand("Intake", new IntakeAndHold(s_Intake, s_Shooter, () -> true));
+        // NamedCommands.registerCommand("ReverseIntake", new IntakeTimed(s_Intake, () -> -0.1, 0.5));
+    }
 }
