@@ -32,11 +32,8 @@ public class Intake extends SubsystemBase{
         pivot.set(speed);
     }
 
-    public void up(){
-        pivot.set(pivotSpeed);
-    }
-    public void down(){
-        pivot.set(-(pivotSpeed));
+    public void set(boolean up){
+        pivot.set(up ? pivotSpeed : -pivotSpeed);
     }
 
     public void stopIntake(){

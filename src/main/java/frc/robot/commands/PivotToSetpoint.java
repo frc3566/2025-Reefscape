@@ -11,7 +11,7 @@ public class PivotToSetpoint extends Command {
     public PivotToSetpoint(Intake m_Intake) {
         this.m_Intake = m_Intake;
         addRequirements(m_Intake);
-        m_Controller = new PIDController(0.01, 0, 0.001);
+        m_Controller = new PIDController(0.01, 0, 0.001); //TODO: Check values
         m_Controller.setTolerance(1.5);
         m_Controller.setSetpoint(45);
 

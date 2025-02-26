@@ -166,10 +166,10 @@ public class RobotContainer {
       // driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
       /* Bumpers - Pivot */
-      driverXbox.leftBumper().onTrue(new InstantCommand(() -> intake.down()));
+      driverXbox.leftBumper().onTrue(new InstantCommand(() -> intake.set(false)));
       driverXbox.leftBumper().onFalse(new InstantCommand(() -> intake.stopPivot()));
       
-      driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.up()));
+      driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.set(true)));
       driverXbox.rightBumper().onFalse(new InstantCommand(() -> intake.stopPivot()));
  
       /* Triggers - Elevator */
