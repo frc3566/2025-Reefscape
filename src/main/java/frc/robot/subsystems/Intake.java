@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -57,8 +58,6 @@ public class Intake extends SubsystemBase{
         .idleMode(IdleMode.kBrake);
     motorConfig.encoder
         .positionConversionFactor(360.0/(81.0/1.0));
-    motorConfig.closedLoop
-        .pid(0, 0, 0);
     return motorConfig;
     }
 
