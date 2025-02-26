@@ -61,16 +61,16 @@ public class Elevator extends SubsystemBase {
         return ((motor.getEncoder().getVelocity() / 60) / Constants.ELEVATOR_GEAR_RATIO) * (2 * Math.PI * Constants.ELEVATOR_DRUM_RADIUS);
     }
  
-private SparkMaxConfig getMotorConfig(boolean isInverted) {
-    // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
-    SparkMaxConfig motorConfig = new SparkMaxConfig();
-    motorConfig
-        .smartCurrentLimit(20)
-        .inverted(isInverted)
-        .idleMode(IdleMode.kBrake);
-    motorConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pidf(0.0042864, 0, 0, 0.0675); //TODO: monitor 
-    return motorConfig;
+    private SparkMaxConfig getMotorConfig(boolean isInverted) {
+        // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
+        SparkMaxConfig motorConfig = new SparkMaxConfig();
+        motorConfig
+            .smartCurrentLimit(20)
+            .inverted(isInverted)
+            .idleMode(IdleMode.kBrake);
+        motorConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pidf(0.0042864, 0, 0, 0.0675); //TODO: monitor 
+        return motorConfig;
     }
 }

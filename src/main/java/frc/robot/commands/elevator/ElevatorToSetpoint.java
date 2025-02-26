@@ -1,19 +1,24 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
 public class ElevatorToSetpoint extends Command {
-    private final PIDController m_Controller;
+    private final ProfiledPIDController controller;
+    private final ElevatorFeedforward feedForward;
     private final Elevator elevator;
     private double setpoint; //HEIGHT
     
     public ElevatorToSetpoint(Elevator elevator, double setpoint) {
         this.elevator = elevator;
         this.setpoint = setpoint;
-        m_Controller = new PIDController(0.01, 0, 0.001); //TODO: change values, these are generic
-        m_Controller.setTolerance(0.02);
+        feedForward = new ElevatorFeedforward(0.22683, 0, 0.0678, 0.0053266); //TODO: do kG and test kS, kV, kA
+        controller = new ProfiledPIDController(0.01, 0, 0.001, new Constraints(1, 0.5)); //TODO: change values, these are generic
+        controller.setTolerance(0.02);
         addRequirements(elevator);
         // Use addRequirements() here to declare subsystem dependencies.
         // Configure additional PID options by calling `getController` here.
@@ -27,9 +32,9 @@ public class ElevatorToSetpoint extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double value = MathUtil.clamp(m_Controller.calculate(elevator.getHeightMeters(), setpoint), 0.3, 1.6);
-        System.out.println("Angle: " + elevator.getHeightMeters() + ", Value: " + value + ", AtPoint: " + m_Controller.atSetpoint());
-        elevator.set(value);
+        double voltOut = MathUtil.clamp(controller.calculate(elevator.getHeightMeters(), setpoint) + feedForward.calculate(elevator.getVelocityMPS(), controller.getSetpoint().velocity), -12, 12);
+        System.out.println("Height: " + elevator.getHeightMeters() + ", Voltage: " + voltOut + ", AtPoint: " + controller.atSetpoint());
+        elevator.setVoltage(voltOut);
     }
 
     // Called once the command ends or is interrupted.
@@ -41,7 +46,7 @@ public class ElevatorToSetpoint extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return m_Controller.atSetpoint();
+        return controller.atSetpoint();
     }
     
 }
