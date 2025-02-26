@@ -193,7 +193,7 @@ public class RobotContainer {
       driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
       driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
 
-      driverXbox.povUpRight().onTrue(new PivotToSetpoint(intake));
+      driverXbox.povUpRight().onTrue(new PivotToSetpoint(intake, 45));
     }
   }
 

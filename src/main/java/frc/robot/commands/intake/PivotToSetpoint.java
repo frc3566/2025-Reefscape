@@ -7,13 +7,14 @@ import frc.robot.subsystems.Intake;
 public class PivotToSetpoint extends Command {
     private final PIDController m_Controller;
     private final Intake m_Intake;
+    private double setpoint; //ANGLE
     
-    public PivotToSetpoint(Intake m_Intake) {
+    public PivotToSetpoint(Intake m_Intake, double setpoint) {
         this.m_Intake = m_Intake;
+        this.setpoint = setpoint;
         addRequirements(m_Intake);
-        m_Controller = new PIDController(0.01, 0, 0.001); //TODO: Check values
+        m_Controller = new PIDController(0.01, 0, 0.001); //TODO: monitor values for accuracy
         m_Controller.setTolerance(1.5);
-        m_Controller.setSetpoint(0);
 
 
 
@@ -31,7 +32,7 @@ public class PivotToSetpoint extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double value = MathUtil.clamp(m_Controller.calculate(m_Intake.getPivotDegree(), 45), -0.3, 0.3);
+        double value = MathUtil.clamp(m_Controller.calculate(m_Intake.getPivotDegree(), setpoint), -0.3, 0.3);
         System.out.println("Angle: " + m_Intake.getPivotDegree() + ", Value: " + value + ", AtPoint: " + m_Controller.atSetpoint());
         m_Intake.set(value);
     }

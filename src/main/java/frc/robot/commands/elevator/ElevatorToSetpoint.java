@@ -7,12 +7,13 @@ import frc.robot.subsystems.Elevator;
 public class ElevatorToSetpoint extends Command {
     private final PIDController m_Controller;
     private final Elevator elevator;
+    private double setpoint; //HEIGHT
     
-    public ElevatorToSetpoint(Elevator elevator) {
+    public ElevatorToSetpoint(Elevator elevator, double setpoint) {
         this.elevator = elevator;
-        m_Controller = new PIDController(0.01, 0, 0.001);
+        this.setpoint = setpoint;
+        m_Controller = new PIDController(0.01, 0, 0.001); //TODO: change values, these are generic
         m_Controller.setTolerance(0.02);
-        m_Controller.setSetpoint(0);
         addRequirements(elevator);
         // Use addRequirements() here to declare subsystem dependencies.
         // Configure additional PID options by calling `getController` here.
@@ -21,14 +22,12 @@ public class ElevatorToSetpoint extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        // double value = Math.clamp(m_Controller.calculate(m_Intake.getPivotDegrees(), 45), minval, maxval);
-
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double value = MathUtil.clamp(m_Controller.calculate(elevator.getHeight(), 1), 0.3, 1.6);
+        double value = MathUtil.clamp(m_Controller.calculate(elevator.getHeight(), setpoint), 0.3, 1.6);
         System.out.println("Angle: " + elevator.getHeight() + ", Value: " + value + ", AtPoint: " + m_Controller.atSetpoint());
         elevator.set(value);
     }
