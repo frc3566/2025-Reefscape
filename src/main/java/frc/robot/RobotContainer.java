@@ -154,10 +154,12 @@ public class RobotContainer {
       // TODO: Refactor with suppliers?
 
       /* Buttons - Climb / Gyro */
-      driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
+      driverXbox.x().whileTrue(drivebase.sysIdDriveMotorCommand());
 
-      driverXbox.a().onTrue(new InstantCommand(() -> climber.up()));
-      driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
+      // driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
+
+      // driverXbox.a().onTrue(new InstantCommand(() -> climber.up()));
+      // driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
 
       driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
