@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -29,6 +30,10 @@ import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
 import frc.robot.commands.vision.ReefUtil;
 import frc.robot.commands.vision.SupplyAprilTagRobotTransform;
+import frc.robot.subsystems.Algae;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
@@ -52,6 +57,10 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
+  private final Climber climber = new Climber();
+  private final Elevator elevator = new Elevator();
+  private final Algae algae = new Algae();
+  private final Intake intake = new Intake();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -205,7 +214,6 @@ public class RobotContainer {
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
     }
-
   }
 
   /**
@@ -226,40 +234,4 @@ public class RobotContainer {
     if (!Robot.isSimulation()) { return; }
     this.drivebase.vision.visionSim.update(this.drivebase.getPose());
   }
-
-   /** 
-     * Use this method to configure PathPlanner settings 
-     * and expose commands to PathPlanner.
-     */
-    private void configurePathPlanner() {
-        var translationPID = new PIDConstants(4.0, 0.0, 0.0);
-        var rotationPID = new PIDConstants(6.0, 0.0, 0.0);
-        var centerToFurthestModule = (Math.sqrt(Constants.Vision.xWidth) + Math.sqrt(Constants.Vision.yWidth)) / 2;
-
-        var config = new HolonomicPathFollowerConfig(
-            translationPID,
-            rotationPID,
-            Constants.AutoConstants.kMaxSpeedMetersPerSecond, 
-            centerToFurthestModule, 
-            new ReplanningConfig() 
-        );
-
-        /* Paths should be flipped if we are on Red Alliance side */
-        BooleanSupplier shouldFlipPath = () -> { return DriverStation.getAlliance().orElse(null) == DriverStation.Alliance.Red; };
-
-        AutoBuilder.configureHolonomic(
-            drivebase::getPose, 
-            drivebase::resetOdometry, 
-            drivebase::getRobotRelativeSpeeds, 
-            drivebase::driveRobotRelative, 
-            config,
-            shouldFlipPath,
-            drivebase
-        );
-
-        /* Register PathPlanner commands here */
-        // NamedCommands.registerCommand("PrimeAndShoot", new PrimeAndShoot(s_Shooter, s_Intake, 1.0));
-        // NamedCommands.registerCommand("Intake", new IntakeAndHold(s_Intake, s_Shooter, () -> true));
-        // NamedCommands.registerCommand("ReverseIntake", new IntakeTimed(s_Intake, () -> -0.1, 0.5));
-    }
 }
