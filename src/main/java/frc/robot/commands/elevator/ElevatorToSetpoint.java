@@ -27,8 +27,8 @@ public class ElevatorToSetpoint extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double value = MathUtil.clamp(m_Controller.calculate(elevator.getHeight(), setpoint), 0.3, 1.6);
-        System.out.println("Angle: " + elevator.getHeight() + ", Value: " + value + ", AtPoint: " + m_Controller.atSetpoint());
+        double value = MathUtil.clamp(m_Controller.calculate(elevator.getHeightMeters(), setpoint), 0.3, 1.6);
+        System.out.println("Angle: " + elevator.getHeightMeters() + ", Value: " + value + ", AtPoint: " + m_Controller.atSetpoint());
         elevator.set(value);
     }
 

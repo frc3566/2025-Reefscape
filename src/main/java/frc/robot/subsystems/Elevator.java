@@ -2,6 +2,10 @@ package frc.robot.subsystems;
 
 
 import frc.robot.Constants;
+
+import java.lang.constant.Constable;
+
+import com.pathplanner.lib.events.TriggerEvent;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -10,6 +14,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
@@ -44,12 +49,16 @@ public class Elevator extends SubsystemBase {
         motor.stopMotor();
     }
 
-    public void setVolatge(double volt) {
+    public void setVoltage(double volt) {
         motor.setVoltage(volt);
     }
 
-    public double getHeight() {
-        return motor.getEncoder().getPosition(); //TODO: change
+    public double getHeightMeters() {
+        return motor.getEncoder().getPosition() / Constants.ELEVATOR_GEAR_RATIO * 2 * Math.PI * Constants.ELEVATOR_DRUM_RADIUS; 
+    }
+
+    public double getVelocityMPS() {
+        return ((motor.getEncoder().getVelocity() / 60) / Constants.ELEVATOR_GEAR_RATIO) * (2 * Math.PI * Constants.ELEVATOR_DRUM_RADIUS);
     }
  
 private SparkMaxConfig getMotorConfig(boolean isInverted) {
@@ -59,11 +68,9 @@ private SparkMaxConfig getMotorConfig(boolean isInverted) {
         .smartCurrentLimit(20)
         .inverted(isInverted)
         .idleMode(IdleMode.kBrake);
-    motorConfig.encoder
-        .positionConversionFactor(360/81);
     motorConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pidf(0.0042864, 0, 0, 0.0675); //TODO: monitor
+        .pidf(0.0042864, 0, 0, 0.0675); //TODO: monitor 
     return motorConfig;
     }
 }
