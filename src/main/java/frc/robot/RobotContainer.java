@@ -102,6 +102,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    // drivebase.replaceSwerveModuleFeedforward(0.36659, 2.87315, 0.297065); // Constants from old sysid code
+    drivebase.replaceSwerveModuleFeedforward(0.1728225, 3.116175, 0.4621125); // SysId Constants 
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
   }
@@ -151,7 +153,7 @@ public class RobotContainer {
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
       // TELEOP
-      
+
       /* Buttons - Climb / Gyro */
       driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
 
