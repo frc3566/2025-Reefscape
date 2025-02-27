@@ -102,6 +102,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    // drivebase.replaceSwerveModuleFeedforward(0.36659, 2.87315, 0.297065); // Constants from old sysid code
+    drivebase.replaceSwerveModuleFeedforward(0.1728225, 3.116175, 0.4621125); // SysId Constants 
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
   }
@@ -150,8 +152,7 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
-      // TELEOP HERE
-      // TODO: Refactor with suppliers?
+      // TELEOP
 
       /* Buttons - Climb / Gyro */
       driverXbox.x().whileTrue(drivebase.sysIdDriveMotorCommand());
@@ -171,23 +172,23 @@ public class RobotContainer {
       driverXbox.rightBumper().onFalse(new InstantCommand(() -> intake.stopPivot()));
  
       /* Triggers - Elevator */
-      driverXbox.leftTrigger().onTrue(new InstantCommand(() -> elevator.up()));
+      driverXbox.leftTrigger().onTrue(new InstantCommand(() -> elevator.down()));
       driverXbox.leftTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
 
-      driverXbox.rightTrigger().onTrue(new InstantCommand(() -> elevator.down()));
+      driverXbox.rightTrigger().onTrue(new InstantCommand(() -> elevator.up()));
       driverXbox.rightTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
 
       /* DPad - Coral / Algae */
-      driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(true))); //coral in
+      driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral in
       driverXbox.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(false))); // coral out
+      driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral out
       driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox.povLeft().onTrue(new InstantCommand(() -> algae.out())); 
+      driverXbox.povLeft().onTrue(new InstantCommand(() -> algae.in())); 
       driverXbox.povLeft().onFalse(new InstantCommand(() -> algae.stop()));
 
-      driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
+      driverXbox.povRight().onTrue(new InstantCommand(() -> algae.out())); 
       driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
     }
   }
