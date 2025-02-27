@@ -26,6 +26,7 @@ public class Intake extends SubsystemBase{
 
     public void runIntake(boolean in){
         intake.set(in ? intakeSpeed : -intakeSpeed);
+        System.out.println("Intake degree:" + getPivotDegree());
     }
 
     public void set(double speed){
@@ -34,6 +35,7 @@ public class Intake extends SubsystemBase{
 
     public void set(boolean up){
         pivot.set(up ? pivotSpeed : -pivotSpeed);
+        System.out.println("Intake degree:" + getPivotDegree());
     }
 
     public void stopIntake(){
@@ -57,8 +59,6 @@ public class Intake extends SubsystemBase{
         .idleMode(IdleMode.kBrake);
     motorConfig.encoder
         .positionConversionFactor(360.0/(81.0/1.0));
-    motorConfig.closedLoop
-        .pid(0, 0, 0);
     return motorConfig;
     }
 
