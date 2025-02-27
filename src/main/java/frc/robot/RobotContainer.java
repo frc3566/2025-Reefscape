@@ -155,12 +155,10 @@ public class RobotContainer {
       // TELEOP
 
       /* Buttons - Climb / Gyro */
-      driverXbox.x().whileTrue(drivebase.sysIdDriveMotorCommand());
+      driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
 
-      // driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
-
-      // driverXbox.a().onTrue(new InstantCommand(() -> climber.up()));
-      // driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
+      driverXbox.a().onTrue(new InstantCommand(() -> climber.up()));
+      driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
 
       driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
