@@ -150,9 +150,8 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
-      // TELEOP HERE
-      // TODO: Refactor with suppliers?
-
+      // TELEOP
+      
       /* Buttons - Climb / Gyro */
       driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
 
@@ -169,23 +168,23 @@ public class RobotContainer {
       driverXbox.rightBumper().onFalse(new InstantCommand(() -> intake.stopPivot()));
  
       /* Triggers - Elevator */
-      driverXbox.leftTrigger().onTrue(new InstantCommand(() -> elevator.up()));
+      driverXbox.leftTrigger().onTrue(new InstantCommand(() -> elevator.down()));
       driverXbox.leftTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
 
-      driverXbox.rightTrigger().onTrue(new InstantCommand(() -> elevator.down()));
+      driverXbox.rightTrigger().onTrue(new InstantCommand(() -> elevator.up()));
       driverXbox.rightTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
 
       /* DPad - Coral / Algae */
-      driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(true))); //coral in
+      driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral in
       driverXbox.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(false))); // coral out
+      driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral out
       driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox.povLeft().onTrue(new InstantCommand(() -> algae.out())); 
+      driverXbox.povLeft().onTrue(new InstantCommand(() -> algae.in())); 
       driverXbox.povLeft().onFalse(new InstantCommand(() -> algae.stop()));
 
-      driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
+      driverXbox.povRight().onTrue(new InstantCommand(() -> algae.out())); 
       driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
     }
   }
