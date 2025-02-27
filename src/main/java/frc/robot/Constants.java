@@ -32,7 +32,7 @@ public final class Constants {
   public static final double ALGAE_IN_SPEED    = 0.2;
   public static final double ALGAE_OUT_SPEED    = 0.4;
   public static final double CLIMBER_SPEED  = 0.5;
-  public static final double ELEVATOR_SPEED  = 0.2;
+  public static final double ELEVATOR_SPEED  = 0.3;
   public static final double INTAKE_SPEED  = 0.4;
   public static final double PIVOT_SPEED  = 0.15;
 

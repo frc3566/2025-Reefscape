@@ -35,10 +35,12 @@ public class Elevator extends SubsystemBase {
 
     public void up() {
         motor.set(speed);
+        System.out.println(getHeightMeters());
     }
 
     public void down() {
         motor.set(-speed);
+        System.out.println(getHeightMeters());
     }
 
     public void set(double speed) {
@@ -57,6 +59,10 @@ public class Elevator extends SubsystemBase {
         return motor.getEncoder().getPosition() / Constants.ELEVATOR_GEAR_RATIO * 2 * Math.PI * Constants.ELEVATOR_DRUM_RADIUS; 
     }
 
+    public double getEncoder() {
+        return motor.getEncoder().getPosition();
+    }
+
     public double getVelocityMPS() {
         return ((motor.getEncoder().getVelocity() / 60) / Constants.ELEVATOR_GEAR_RATIO) * (2 * Math.PI * Constants.ELEVATOR_DRUM_RADIUS);
     }
@@ -70,7 +76,7 @@ public class Elevator extends SubsystemBase {
             .idleMode(IdleMode.kBrake);
         motorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pidf(0.0042864, 0, 0, 0.0675); //TODO: monitor 
+            .pid(0.042864, 0, 0); //TODO: monitor 
         return motorConfig;
     }
 }

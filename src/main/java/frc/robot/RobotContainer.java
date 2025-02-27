@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.elevator.ElevatorToSetpoint;
+import frc.robot.commands.intake.PivotToSetpoint;
 import frc.robot.commands.swervedrive.auto.DriveToReefAbsolute;
 import frc.robot.commands.swervedrive.auto.DriveToReefRelative;
 import frc.robot.commands.swervedrive.drivebase.Drive;
@@ -149,7 +151,7 @@ public class RobotContainer {
     Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
     if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocityKeyboard);
+      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
     } else {
       drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     }
@@ -169,50 +171,49 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } else {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    //   driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-    //   // driverXbox.b().whileTrue(
-    //   //     drivebase.driveToPose(
-    //   //         new Pose2d(new Translation2d(1, 0), Rotation2d.fromDegrees(0))));
+      // TELEOP HERE
+      // TODO: Refactor with suppliers?
 
-      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
-      driverXbox.b().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
+      // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
+      // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
 
-      driverXbox.x().whileTrue(new InstantCommand(() -> {
-        System.out.println("pressed x");
-        Vision.Cameras.MAIN.updateUnreadResults();
-        Vision.Cameras.MAIN.getLatestResult()
-          .map(e -> (e.hasTargets() ? e.getBestTarget() : null))
-          .map(Vision::getRobotRelativeTransformTo)
-          .ifPresent(System.out::println);
-      }).repeatedly());
+      /* Buttons - Climb / Gyro */
+      driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
 
-      // double multiplier = 1;
-      // double adjustY = Units.inchesToMeters(6.469);
-      // double robotXWidth = Constants.Vision.xWidth;
+      driverXbox.a().onTrue(new InstantCommand(() -> climber.up()));
+      driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
 
-      // driverXbox.b().whileTrue(
-      //   new SupplyAprilTagRobotTransform((pose) -> {
-      //       Pose2d targetPose;
-      //       targetPose = new Pose2d(
-      //           pose.getTranslation().minus(
-      //               new Translation2d(
-      //                   robotXWidth * 3 / 4,
-      //                   adjustY * multiplier
-      //               ).rotateBy(pose.getRotation())
-      //           ),
-      //           pose.getRotation()
-      //       );
+      driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
+      driverXbox.povDownRight().whileTrue(new PivotToSetpoint(intake, -104));
 
-      //       System.out.println(targetPose);
-      //   }, DriveToReefRelative::getTargettingIds)
-      //   // new Drive(this.drivebase, () -> new Pose2d(new Translation2d(0.5, 0), Rotation2d.fromDegrees(0)))
-      // );
+      /* Bumpers - Pivot */
+      driverXbox.leftBumper().onTrue(new InstantCommand(() -> intake.set(false)));
+      driverXbox.leftBumper().onFalse(new InstantCommand(() -> intake.stopPivot()));
+      
+      driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.set(true)));
+      driverXbox.rightBumper().onFalse(new InstantCommand(() -> intake.stopPivot()));
+ 
+      /* Triggers - Elevator */
+      driverXbox.leftTrigger().onTrue(new InstantCommand(() -> elevator.up()));
+      driverXbox.leftTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
 
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      driverXbox.rightTrigger().onTrue(new InstantCommand(() -> elevator.down()));
+      driverXbox.rightTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
+
+      /* DPad - Coral / Algae */
+      driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(true))); //coral in
+      driverXbox.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
+
+      driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(false))); // coral out
+      driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
+
+      driverXbox.povLeft().onTrue(new InstantCommand(() -> algae.out())); 
+      driverXbox.povLeft().onFalse(new InstantCommand(() -> algae.stop()));
+
+      driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
+      driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
+
+      driverXbox.povUpRight().onTrue(new ElevatorToSetpoint(elevator, 1));
     }
   }
 

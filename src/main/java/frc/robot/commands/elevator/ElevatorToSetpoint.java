@@ -16,8 +16,8 @@ public class ElevatorToSetpoint extends Command {
     public ElevatorToSetpoint(Elevator elevator, double setpoint) {
         this.elevator = elevator;
         this.setpoint = setpoint;
-        feedForward = new ElevatorFeedforward(0.22683, 0, 0.0678, 0.0053266); //TODO: do kG and test kS, kV, kA
-        controller = new ProfiledPIDController(0.01, 0, 0.001, new Constraints(1, 0.5)); //TODO: change values, these are generic
+        feedForward = new ElevatorFeedforward(0.22683, 0, 6.78, 0.53266); //TODO: do kG and test kS, kV, kA
+        controller = new ProfiledPIDController(10, 0, 1, new Constraints(2, 1)); //TODO: change values, these are generic
         controller.setTolerance(0.02);
         addRequirements(elevator);
         // Use addRequirements() here to declare subsystem dependencies.
@@ -32,8 +32,8 @@ public class ElevatorToSetpoint extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double voltOut = MathUtil.clamp(controller.calculate(elevator.getHeightMeters(), setpoint) + feedForward.calculate(elevator.getVelocityMPS(), controller.getSetpoint().velocity), -12, 12);
-        System.out.println("Height: " + elevator.getHeightMeters() + ", Voltage: " + voltOut + ", AtPoint: " + controller.atSetpoint());
+        double voltOut = MathUtil.clamp(controller.calculate(elevator.getEncoder(), setpoint) + feedForward.calculate(elevator.getVelocityMPS(), controller.getSetpoint().velocity), -12, 12);
+        System.out.println("Encoder: " + elevator.getEncoder() + ", Height: " + elevator.getHeightMeters() + ", Voltage: " + voltOut + ", AtPoint: " + controller.atSetpoint());
         elevator.setVoltage(voltOut);
     }
 
