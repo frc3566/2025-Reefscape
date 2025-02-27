@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -19,58 +20,36 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
 public class Elevator extends SubsystemBase {
-    private  SparkMax masterMotor, followerMotor; // Use one motor as the main one
-    private  RelativeEncoder encoder;
-    private  ProfiledPIDController m_controller;
-    private ElevatorFeedforward feedforward;
-    private final double speed = 0.2;
-    private double ElevatorGearing = 81.0/1.0;
-    private double kElevatorDrumRadius = 1.756;
+    public SparkMax left, right;
+    public double speed = Constants.ELEVATOR_SPEED;
 
     public Elevator() {
-        masterMotor = new SparkMax(10, MotorType.kBrushless); // Use one motor as the main one
-        followerMotor = new SparkMax(11, MotorType.kBrushless);
-        encoder = masterMotor.getEncoder();
-
-
-
-        SparkMaxConfig primaryConfig = getMotorConfig(false);
-        SparkMaxConfig followerConfig = getMotorConfig(true);
-        followerConfig.follow(masterMotor, true);
-        masterMotor.configure(primaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        followerMotor.configure(followerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-    
+        left = new SparkMax(10, MotorType.kBrushless);
+        right = new SparkMax(11, MotorType.kBrushless);
+        left.configure(getMotorConfig(true), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        right.configure(getMotorConfig(false), ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void up() {
-        masterMotor.set(-speed); // TODO: fix inversion
-        System.out.println("Elevator motor rotation:" + getRotation());
+        left.set(speed);
+        right.set(speed);
     }
 
     public void down() {
-        masterMotor.set(speed);
-        System.out.println("Elevator motor rotation:" + getRotation());
+        left.set(-speed);
+        right.set(-speed);
     }
 
     public void stop() {
-        masterMotor.stopMotor();
-        System.out.println("Elevator motor rotation:" + getRotation());
+        left.stopMotor();
+        right.stopMotor();
     }
 
-    public void setVoltage(double volt) {
-        masterMotor.setVoltage(volt);
+    public void setVolatge(double volt) {
+        left.setVoltage(volt);
+        right.setVoltage(volt);
     }
-
-    public double getRotation() {
-        return masterMotor.getEncoder().getPosition();
-    }
-    
-    public double getVelocityMetersPerSecond()
-    {
-      return ((encoder.getVelocity() / 60)/ (ElevatorGearing)) *
-             (2 * Math.PI * kElevatorDrumRadius);
-    }
-
+ 
 private SparkMaxConfig getMotorConfig(boolean isInverted) {
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
@@ -78,8 +57,6 @@ private SparkMaxConfig getMotorConfig(boolean isInverted) {
         .smartCurrentLimit(40)
         .inverted(isInverted)
         .idleMode(IdleMode.kBrake);
-    motorConfig.encoder
-        .positionConversionFactor(360.0/(81.0/1.0));
     return motorConfig;
     }
 }

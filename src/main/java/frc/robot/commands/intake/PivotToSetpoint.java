@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -7,9 +7,11 @@ import frc.robot.subsystems.Intake;
 public class PivotToSetpoint extends Command {
     private final PIDController m_Controller;
     private final Intake m_Intake;
+    private double setpoint; //ANGLE
     
-    public PivotToSetpoint(Intake m_Intake) {
+    public PivotToSetpoint(Intake m_Intake, double setpoint) {
         this.m_Intake = m_Intake;
+        this.setpoint = setpoint;
         addRequirements(m_Intake);
         m_Controller = new PIDController(0.05, 0, 0.001); //TODO: Check values
         m_Controller.setTolerance(1);
@@ -39,7 +41,7 @@ public class PivotToSetpoint extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        m_Intake.set(0);
+        m_Intake.stopPivot();
     }
 
     // Returns true when the command should end.

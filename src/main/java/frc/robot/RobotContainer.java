@@ -17,7 +17,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.PivotToSetpoint;
+import frc.robot.commands.*;
+import frc.robot.commands.intake.PivotToSetpoint;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.*;
 
@@ -195,7 +196,7 @@ public class RobotContainer {
       driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
       driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
 
-      driverXbox.povUpRight().onTrue(new PivotToSetpoint(intake));
+      driverXbox.povUpRight().onTrue(new PivotToSetpoint(intake, 45));
     }
   }
 
