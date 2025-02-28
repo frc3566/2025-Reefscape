@@ -35,12 +35,10 @@ public class Elevator extends SubsystemBase {
 
     public void up() {
         motor.set(speed);
-        System.out.println(getHeightMeters());
     }
 
     public void down() {
         motor.set(-speed);
-        System.out.println(getHeightMeters());
     }
 
     public void set(double speed) {
@@ -49,6 +47,7 @@ public class Elevator extends SubsystemBase {
 
     public void stop() {
         motor.stopMotor();
+        System.out.println(getHeightMeters());
     }
 
     public void setVoltage(double volt) {

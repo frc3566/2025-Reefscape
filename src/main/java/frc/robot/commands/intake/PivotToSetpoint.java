@@ -3,6 +3,7 @@ package frc.robot.commands.intake;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.Intake;
 public class PivotToSetpoint extends Command {
     private final PIDController m_Controller;
@@ -11,7 +12,7 @@ public class PivotToSetpoint extends Command {
     
     public PivotToSetpoint(Intake m_Intake, double setpoint) {
         this.m_Intake = m_Intake;
-        this.setpoint = setpoint;
+        this.setpoint = setpoint + Constants.PIVOT_OFFSET;
         addRequirements(m_Intake);
         m_Controller = new PIDController(0.05, 0, 0.001); //TODO: monitor values for accuracy
         m_Controller.setTolerance(1.5);

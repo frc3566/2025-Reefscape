@@ -23,6 +23,9 @@ import swervelib.math.Matter;
  */
 public final class Constants {
 
+  public static final double PIVOT_OFFSET = 0;
+  public static final double ELEVATOR_OFFSET = 0;
+
   public static final double ELEVATOR_GEAR_RATIO = (81.0/1.0);
   public static final double ELEVATOR_DRUM_RADIUS = Units.inchesToMeters(1.756);
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound, TODO: Replace actual mass

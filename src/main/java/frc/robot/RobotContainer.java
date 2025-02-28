@@ -184,7 +184,7 @@ public class RobotContainer {
       driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
 
       driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
-      driverXbox.povDownRight().whileTrue(new PivotToSetpoint(intake, -104));
+      driverXbox.povDownRight().whileTrue(new PivotToSetpoint(intake, 30));
 
       /* Bumpers - Pivot */
       driverXbox.leftBumper().onTrue(new InstantCommand(() -> intake.set(false)));
@@ -213,7 +213,7 @@ public class RobotContainer {
       driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
       driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
 
-      driverXbox.povUpRight().onTrue(new ElevatorToSetpoint(elevator, 1));
+      driverXbox.povUpRight().onTrue(new ElevatorToSetpoint(elevator, 0.12));
     }
   }
 
