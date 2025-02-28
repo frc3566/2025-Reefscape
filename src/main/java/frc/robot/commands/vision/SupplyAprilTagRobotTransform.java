@@ -54,8 +54,9 @@ public class SupplyAprilTagRobotTransform extends Command implements WithStatus 
             return;
         }
 
-        var target = result.get().getBestTarget();
         if (!result.get().hasTargets()) { return; }
+        
+        var target = result.get().getBestTarget();
         if (!targetIds.get().contains(target.getFiducialId())) { return; }
 
         Transform2d transformToAprilTag = Vision.getRobotRelativeTransformTo(target);

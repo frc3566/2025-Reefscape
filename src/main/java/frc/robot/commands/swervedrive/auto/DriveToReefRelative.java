@@ -58,7 +58,7 @@ public class DriveToReefRelative extends SequentialCommandGroup implements WithS
                 targetPose = new Pose2d(
                     pose.getTranslation().minus(
                         new Translation2d(
-                            robotXWidth * 5 / 8,
+                            robotXWidth, // * 5 / 8,
                             -adjustY * multiplier
                         ).rotateBy(pose.getRotation())
                     ),

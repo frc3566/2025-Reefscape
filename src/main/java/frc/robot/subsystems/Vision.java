@@ -441,6 +441,10 @@ public class Vision {
       }
     }
 
+    public PhotonCamera getCamera() {
+      return camera;
+    }
+
     /**
      * Get the result with the least ambiguity from the best tracked target within
      * the Cache. This may not be the most

@@ -73,6 +73,8 @@ public class Elevator extends SubsystemBase {
             .smartCurrentLimit(20)
             .inverted(isInverted)
             .idleMode(IdleMode.kBrake);
+        motorConfig.encoder
+            .positionConversionFactor(360/81);
         motorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(0.042864, 0, 0); //TODO: monitor 

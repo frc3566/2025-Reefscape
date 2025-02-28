@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -28,6 +29,7 @@ import frc.robot.commands.elevator.ElevatorToSetpoint;
 import frc.robot.commands.intake.PivotToSetpoint;
 import frc.robot.commands.swervedrive.auto.DriveToReefAbsolute;
 import frc.robot.commands.swervedrive.auto.DriveToReefRelative;
+import frc.robot.commands.swervedrive.drivebase.AbsoluteDrive;
 import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
 import frc.robot.commands.vision.ReefUtil;
@@ -71,7 +73,7 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+      .withControllerRotationAxis(() -> driverXbox.getRightX())
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
@@ -177,14 +179,40 @@ public class RobotContainer {
       // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
       // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
 
+      driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      
       /* Buttons - Climb / Gyro */
-      driverXbox.y().onTrue(new InstantCommand(() -> climber.down()));
 
-      driverXbox.a().onTrue(new InstantCommand(() -> climber.up()));
-      driverXbox.a().onFalse(new InstantCommand(() -> climber.stop()));
+      driverXbox.a().whileTrue(
+        new Drive(drivebase, () -> new Pose2d(new Translation2d(1, 0), new Rotation2d()))
+      );
+      
 
-      driverXbox.b().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
-      driverXbox.povDownRight().whileTrue(new PivotToSetpoint(intake, 30));
+      // driverXbox.a().whileTrue(
+      //   new Spin(drivebase, () -> new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(90)))
+      // );
+
+      // driverXbox.y().whileTrue(
+      //   new SequentialCommandGroup(
+      //     new InstantCommand(() -> {
+      //       drivebase.resetOdometry(new Pose2d());
+      //     }),
+      //     drivebase.driveToPose(new Pose2d(new Translation2d(1, 0), new Rotation2d()))
+      //   )
+      // );
+
+      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      // driverXbox.a().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
+
+      driverXbox.x().whileTrue(new InstantCommand(() -> {
+        System.out.println("pressed x");
+        Vision.Cameras.MAIN.updateUnreadResults();
+        Vision.Cameras.MAIN.getCamera().getLatestResult();
+        Vision.Cameras.MAIN.getBestResult()
+          .map(e -> (e.hasTargets() ? e.getBestTarget() : null))
+          .map(Vision::getRobotRelativeTransformTo)
+          .ifPresent(System.out::println);
+      }).repeatedly());
 
       /* Bumpers - Pivot */
       driverXbox.leftBumper().onTrue(new InstantCommand(() -> intake.set(false)));
@@ -213,7 +241,7 @@ public class RobotContainer {
       driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
       driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
 
-      driverXbox.povUpRight().onTrue(new ElevatorToSetpoint(elevator, 0.12));
+      driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 360));
     }
   }
 
