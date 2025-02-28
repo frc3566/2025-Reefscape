@@ -58,6 +58,7 @@ public class Spin extends Command implements WithStatus {
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         s_SwerveSubsystem.zeroGyro();
+        s_SwerveSubsystem.temporarilyStopLocalization = true;
         s_SwerveSubsystem.resetOdometry(new Pose2d());
         thetaController.reset(new Pose2d().getRotation().getRadians());
     }
@@ -76,6 +77,7 @@ public class Spin extends Command implements WithStatus {
     @Override
     public void end(boolean interrupted) {
         isRunning = false;
+        s_SwerveSubsystem.temporarilyStopLocalization = false;
         s_SwerveSubsystem.drive(new Translation2d(), 0, true);
     }
 

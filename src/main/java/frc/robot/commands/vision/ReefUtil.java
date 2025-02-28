@@ -10,6 +10,8 @@ public class ReefUtil {
     }
 
     public static List<Integer> getTargettingIds() {
+        // return List.of(1);
+
         if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
             return List.of(17, 18, 19, 20, 21, 22);
         } else {

@@ -55,6 +55,7 @@ public class Drive extends Command implements WithStatus {
         ));
 
         s_SwerveSubsystem.zeroGyro();
+        s_SwerveSubsystem.temporarilyStopLocalization = true;
         s_SwerveSubsystem.resetOdometry(new Pose2d());
         driveController.reset(new Translation2d().getDistance(targetPose.getTranslation()));
     }
@@ -80,6 +81,7 @@ public class Drive extends Command implements WithStatus {
     @Override
     public void end(boolean interrupted) {
         isRunning = false;
+        s_SwerveSubsystem.temporarilyStopLocalization = false;
         s_SwerveSubsystem.drive(new Translation2d(), 0, true);
     }
 

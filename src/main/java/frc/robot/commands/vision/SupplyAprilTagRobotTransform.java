@@ -48,16 +48,18 @@ public class SupplyAprilTagRobotTransform extends Command implements WithStatus 
         Vision.Cameras.MAIN.updateUnreadResults();
         var result = Vision.Cameras.MAIN.getLatestResult();
         
-        if (result.isEmpty()) {
+        if (result.isEmpty() || !result.get().hasTargets()) {
             counter += 1;
             System.out.println("Cycle: " + counter);
             return;
         }
-
-        if (!result.get().hasTargets()) { return; }
         
         var target = result.get().getBestTarget();
-        if (!targetIds.get().contains(target.getFiducialId())) { return; }
+        if (!targetIds.get().contains(target.getFiducialId())) { 
+            counter += 1;
+            System.out.println("Cycle: " + counter);
+            return;
+        }
 
         Transform2d transformToAprilTag = Vision.getRobotRelativeTransformTo(target);
         System.out.println("> April Tag: " + transformToAprilTag);

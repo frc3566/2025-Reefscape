@@ -71,9 +71,9 @@ public class RobotContainer {
    * by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> driverXbox.getLeftY() * -1,
-      () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverXbox.getRightX())
+      () -> driverXbox.getLeftY(),
+      () -> driverXbox.getLeftX())
+      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
@@ -186,7 +186,6 @@ public class RobotContainer {
       driverXbox.a().whileTrue(
         new Drive(drivebase, () -> new Pose2d(new Translation2d(1, 0), new Rotation2d()))
       );
-      
 
       // driverXbox.a().whileTrue(
       //   new Spin(drivebase, () -> new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(90)))
@@ -207,11 +206,12 @@ public class RobotContainer {
       driverXbox.x().whileTrue(new InstantCommand(() -> {
         System.out.println("pressed x");
         Vision.Cameras.MAIN.updateUnreadResults();
-        Vision.Cameras.MAIN.getCamera().getLatestResult();
-        Vision.Cameras.MAIN.getBestResult()
-          .map(e -> (e.hasTargets() ? e.getBestTarget() : null))
-          .map(Vision::getRobotRelativeTransformTo)
-          .ifPresent(System.out::println);
+        var result = Vision.Cameras.MAIN.getCamera().getLatestResult();
+        System.out.println(result.hasTargets() ? result.getBestTarget() : null);
+        // Vision.Cameras.MAIN.getBestResult()
+        //   .map(e -> (e.hasTargets() ? e.getBestTarget() : null))
+        //   .map(Vision::getRobotRelativeTransformTo)
+        //   .ifPresent(System.out::println);
       }).repeatedly());
 
       /* Bumpers - Pivot */

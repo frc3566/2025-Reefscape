@@ -478,7 +478,9 @@ public class Vision {
      *         there.
      */
     public Optional<PhotonPipelineResult> getLatestResult() {
-      return resultsList.isEmpty() ? Optional.empty() : Optional.of(resultsList.get(0));
+      var temp = camera.getLatestResult();
+      return temp.hasTargets() ? Optional.of(temp) : Optional.empty();
+      // return resultsList.isEmpty() ? Optional.empty() : Optional.of(resultsList.get(0));
     }
 
     /**
