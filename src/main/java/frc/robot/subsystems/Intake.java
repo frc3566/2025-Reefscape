@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase{
     }
 
     public void runIntake(boolean in){
-        intake.set(in ? intakeSpeed : -intakeSpeed);
+        intake.set(in ? -intakeSpeed : intakeSpeed);
     }
 
     public void set(double speed){

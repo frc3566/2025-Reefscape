@@ -229,10 +229,10 @@ public class RobotContainer {
       driverXbox.rightTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
 
       /* DPad - Coral / Algae */
-      driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(true))); //coral in
+      driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral out
       driverXbox.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(false))); // coral out
+      driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
       driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
       driverXbox.povLeft().onTrue(new InstantCommand(() -> algae.out())); 
