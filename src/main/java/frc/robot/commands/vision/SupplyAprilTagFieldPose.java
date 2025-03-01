@@ -47,18 +47,15 @@ public class SupplyAprilTagFieldPose extends Command implements WithStatus {
         Vision.Cameras.MAIN.updateUnreadResults();
         var result = Vision.Cameras.MAIN.getLatestResult();
         
-        if (result.isEmpty() || !result.get().hasTargets()) {
+        if (result.isEmpty()) {
             counter += 1;
             System.out.println("Cycle: " + counter);
             return;
         }
 
         var target = result.get().getBestTarget();
-        if (!targetIds.get().contains(target.getFiducialId())) { 
-            counter += 1;
-            System.out.println("Cycle: " + counter);
-            return;
-        }
+        if (!result.get().hasTargets()) { return; }
+        if (!targetIds.get().contains(target.getFiducialId())) { return; }
 
         Pose2d aprilTagPoseOnField = Vision.getAprilTagPose(target.getFiducialId(), new Transform2d());
         System.out.println("> April Tag: " + aprilTagPoseOnField);

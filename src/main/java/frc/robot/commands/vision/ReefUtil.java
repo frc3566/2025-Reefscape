@@ -2,6 +2,7 @@ package frc.robot.commands.vision;
 
 import java.util.List;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class ReefUtil {
@@ -10,12 +11,12 @@ public class ReefUtil {
     }
 
     public static List<Integer> getTargettingIds() {
-        return List.of(1);
-
-        // if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
-        //     return List.of(17, 18, 19, 20, 21, 22);
-        // } else {
-        //     return List.of(6, 7, 8, 9, 10, 11);
-        // }
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
+            return List.of(17, 18, 19, 20, 21, 22);
+        } else {
+            return List.of(6, 7, 8, 9, 10, 11);
+        }
     }
+
+    public static final double adjustY = Units.inchesToMeters(6.469);
 }

@@ -76,8 +76,6 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Vision vision;
 
-  private boolean temporarilyStopLocalization = false;
-
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -144,18 +142,12 @@ public class SwerveSubsystem extends SubsystemBase {
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
-  public void toggleLocalization(boolean on) {
-    temporarilyStopLocalization = !on;
-  }
-
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest) {
       swerveDrive.updateOdometry();
-      if (!temporarilyStopLocalization) {
-        vision.updatePoseEstimation(swerveDrive);
-      }
+      vision.updatePoseEstimation(swerveDrive);
     }
   }
 
