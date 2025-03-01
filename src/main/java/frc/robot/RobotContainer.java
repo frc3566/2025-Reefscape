@@ -61,6 +61,7 @@ import swervelib.SwerveInputStream;
  */
 public class RobotContainer {
 
+
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
@@ -216,9 +217,10 @@ public class RobotContainer {
       //     drivebase.driveToPose(new Pose2d(new Translation2d(1, 0), new Rotation2d()))
       //   )
       // );
-
-      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
-      driverXbox.a().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      driverXbox.y().whileTrue(drivebase.sysIdDriveMotorCommand()); //Drive straight
+      driverXbox.a().whileTrue(drivebase.sysIdAngleMotorCommand()); //Angle motor
+      // driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
+      // driverXbox.a().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
       // driverXbox.a().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
 
       driverXbox.x().whileTrue(new InstantCommand(() -> {
