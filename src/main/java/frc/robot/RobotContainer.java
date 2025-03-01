@@ -76,12 +76,12 @@ public class RobotContainer {
    * by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> driverXbox.getLeftY(),
-      () -> driverXbox.getLeftX())
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
       .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
+      .allianceRelativeControl(false);
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative
@@ -218,7 +218,8 @@ public class RobotContainer {
       // );
 
       driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
-      driverXbox.a().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
+      driverXbox.a().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      // driverXbox.a().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
 
       driverXbox.x().whileTrue(new InstantCommand(() -> {
         System.out.println("pressed x");
