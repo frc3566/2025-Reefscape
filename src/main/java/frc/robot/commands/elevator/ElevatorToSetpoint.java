@@ -20,7 +20,8 @@ public class ElevatorToSetpoint extends Command {
         feedForward = new ElevatorFeedforward(0.22683, 0, 0.678, 0.0053266); //TODO: do kG and test kS, kV, kA
         controller = new ProfiledPIDController(8, 0, 0.8, new Constraints(1, 0.5)); //TODO: change values, these are generic
         controller.setTolerance(0.02);
-        // controller.reset(elevator.getHeightMeters()); //TODO: figure out reset
+        // controller.reset(elevator.getHeightMeters() - setpoint);
+        // controller.setGoal(setpoint); 
         addRequirements(elevator);
         // Use addRequirements() here to declare subsystem dependencies.
         // Configure additional PID options by calling `getController` here.
@@ -30,9 +31,9 @@ public class ElevatorToSetpoint extends Command {
     @Override
     public void initialize() 
     {
-        controller.reset(elevator.getHeightMeters());
-        // controller.reset(elevator.getHeightMeters() - 0);
-        controller.setGoal(setpoint);
+        controller.reset(elevator.getHeightMeters()); //TODO: figure out reset
+        // controller.reset(elevator.getHeightMeters() - setpoint);
+        // controller.setGoal(setpoint);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -53,7 +54,7 @@ public class ElevatorToSetpoint extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return controller.atSetpoint();
+        return controller.atGoal();
     }
     
 }
