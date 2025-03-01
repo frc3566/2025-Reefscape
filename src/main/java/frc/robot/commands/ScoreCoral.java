@@ -13,21 +13,25 @@ public class ScoreCoral extends SequentialCommandGroup {
         switch(level) {
             case 1:
                 elevatorSetpoint = 1; intakeSetpoint = 2;
+                break;
             case 2:
-                elevatorSetpoint = 1; intakeSetpoint = 2;
+                elevatorSetpoint = 1.55; intakeSetpoint = 112;
+                break; 
             case 3:
-                elevatorSetpoint = 1; intakeSetpoint = 2;
+                elevatorSetpoint = 3.04; intakeSetpoint = 112;
+                break;
             case 4:
                 elevatorSetpoint = 1; intakeSetpoint = 2;
+                break;
         }
         addCommands(
             new ElevatorToSetpoint(elevator, elevatorSetpoint),
-            new PivotToSetpoint(intake, intakeSetpoint),
-            new InstantCommand(() -> intake.runIntake(false)),
-            new WaitCommand(1),
-            new InstantCommand(() -> intake.stopIntake()),
-            new PivotToSetpoint(intake, 0),
-            new ElevatorToSetpoint(elevator, 1)
+            new PivotToSetpoint(intake, intakeSetpoint)
+            // new InstantCommand(() -> intake.runIntake(false)),
+            // new WaitCommand(1),
+            // new InstantCommand(() -> intake.stopIntake())
+            // new PivotToSetpoint(intake, 0),
+            // new ElevatorToSetpoint(elevator, 1)
         );
     }
 

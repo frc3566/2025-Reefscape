@@ -42,6 +42,7 @@ public class Intake extends SubsystemBase{
     }
 
     public void stopPivot(){
+        System.out.println(getPivotDegree());
         pivot.stopMotor();
     }
 

@@ -4,6 +4,13 @@
 
 package frc.robot;
 
+
+// ANGLES FOR AUTO:
+
+//ELEVATOR HEIGHT AT BARS: 0.5, IRL: TBD
+//ELEVATOR HEIGHT AT INTAKE STATION: 0.66 (closer to 0.75), IRL: TBD
+//PIVOT ANGLE AT INTAKE STATION:56.2 , IRL: -24
+// L2 angle 112, elevator 1.55
 import org.photonvision.simulation.SimCameraProperties;
 
 import edu.wpi.first.math.geometry.Rotation2d;

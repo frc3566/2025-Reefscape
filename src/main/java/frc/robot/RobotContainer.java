@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.GetCoral;
+import frc.robot.commands.ScoreCoral;
 import frc.robot.commands.elevator.ElevatorToSetpoint;
 import frc.robot.commands.intake.PivotToSetpoint;
 import frc.robot.commands.swervedrive.auto.DriveToReefAbsolute;
@@ -241,7 +243,10 @@ public class RobotContainer {
       driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
       driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
 
-      driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 360));
+      driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 0.66));
+      driverXbox.povUpLeft().whileTrue(new GetCoral(elevator, intake));
+      driverXbox.povDownLeft().whileTrue(new ScoreCoral(elevator, intake, 2));
+      driverXbox.povDownRight().whileTrue(new ScoreCoral(elevator, intake ,3));
     }
   }
 
