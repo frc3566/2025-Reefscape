@@ -22,7 +22,8 @@ import frc.robot.subsystems.SwerveSubsystem;
  */
 public class Drive extends Command implements WithStatus {
     private SwerveSubsystem s_SwerveSubsystem;
-    private Supplier<Pose2d> targetPoseSupplier;
+    private Supplier<Transform2d> targetTransformSupplier;
+    private Transform2d targetTransform;
     private Pose2d targetPose;
 
     private ProfiledPIDController driveController;
@@ -35,9 +36,9 @@ public class Drive extends Command implements WithStatus {
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     }
 
-    public Drive(SwerveSubsystem s_SwerveSubsystem, Supplier<Pose2d> targetPoseSupplier) {
+    public Drive(SwerveSubsystem s_SwerveSubsystem, Supplier<Transform2d> targetTransformSupplier) {
         this.s_SwerveSubsystem = s_SwerveSubsystem;
-        this.targetPoseSupplier = targetPoseSupplier;
+        this.targetTransformSupplier = targetTransformSupplier;
 
         isRunning = false;
 
@@ -48,16 +49,16 @@ public class Drive extends Command implements WithStatus {
     public void initialize() {
         isRunning = true;
 
-        targetPose = targetPoseSupplier.get();
+        targetTransform = targetTransformSupplier.get();
+        var currentPose = s_SwerveSubsystem.getPose();
+        targetPose = currentPose.transformBy(targetTransform);
 
         this.driveController = new ProfiledPIDController(DriveCommandConstants.kPXController, 0, 0, new TrapezoidProfile.Constraints(
             DriveCommandConstants.kMaxSpeedMetersPerSecond, DriveCommandConstants.kMaxAccelerationMetersPerSecondSquared
         ));
 
-        s_SwerveSubsystem.zeroGyro();
-        s_SwerveSubsystem.temporarilyStopLocalization = true;
-        s_SwerveSubsystem.resetOdometry(new Pose2d());
-        driveController.reset(new Translation2d().getDistance(targetPose.getTranslation()));
+
+        driveController.reset(currentPose.getTranslation().getDistance(targetPose.getTranslation()));
     }
 
     @Override
@@ -81,7 +82,7 @@ public class Drive extends Command implements WithStatus {
     @Override
     public void end(boolean interrupted) {
         isRunning = false;
-        s_SwerveSubsystem.temporarilyStopLocalization = false;
+        s_SwerveSubsystem.toggleLocalization(true);
         s_SwerveSubsystem.drive(new Translation2d(), 0, true);
     }
 

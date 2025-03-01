@@ -76,7 +76,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Vision vision;
 
-  public boolean temporarilyStopLocalization = false;
+  private boolean temporarilyStopLocalization = false;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -142,6 +142,10 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void setupPhotonVision() {
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+  }
+
+  public void toggleLocalization(boolean on) {
+    temporarilyStopLocalization = !on;
   }
 
   @Override

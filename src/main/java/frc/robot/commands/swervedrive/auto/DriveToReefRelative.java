@@ -44,7 +44,7 @@ public class DriveToReefRelative extends SequentialCommandGroup implements WithS
 
     double adjustY = Units.inchesToMeters(6.469);
 
-    private Pose2d targetPose = new Pose2d();
+    private Transform2d targetPose = new Transform2d();
 
     public DriveToReefRelative(SwerveSubsystem swerve, LeftRight side) {
         this.swerve = swerve;
@@ -55,7 +55,7 @@ public class DriveToReefRelative extends SequentialCommandGroup implements WithS
 
         commandsWithStatus = List.of(
             new SupplyAprilTagRobotTransform((pose) -> {
-                targetPose = new Pose2d(
+                targetPose = new Transform2d(
                     pose.getTranslation().minus(
                         new Translation2d(
                             robotXWidth, // * 5 / 8,

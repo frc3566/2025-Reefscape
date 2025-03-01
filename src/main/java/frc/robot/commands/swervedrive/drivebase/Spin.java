@@ -21,8 +21,9 @@ import frc.robot.subsystems.SwerveSubsystem;
  */
 public class Spin extends Command implements WithStatus {
     private SwerveSubsystem s_SwerveSubsystem;
-    private Supplier<Pose2d> targetPoseSupplier;
-    private Pose2d targetPose;
+    private Supplier<Transform2d> targetTransformSupplier;
+    private Transform2d targetTransform;
+    private double targetAngle;
 
     private ProfiledPIDController thetaController;
 
@@ -38,9 +39,9 @@ public class Spin extends Command implements WithStatus {
         );
     }
 
-    public Spin(SwerveSubsystem s_SwerveSubsystem, Supplier<Pose2d> targetPoseSupplier) {
+    public Spin(SwerveSubsystem s_SwerveSubsystem, Supplier<Transform2d> targetTransformSupplier) {
         this.s_SwerveSubsystem = s_SwerveSubsystem;
-        this.targetPoseSupplier = targetPoseSupplier;
+        this.targetTransformSupplier = targetTransformSupplier;
 
         isRunning = false;
 
@@ -50,17 +51,17 @@ public class Spin extends Command implements WithStatus {
     @Override
     public void initialize() {
         isRunning = true;
-        targetPose = targetPoseSupplier.get();
+        
+        targetTransform = targetTransformSupplier.get();
+        double currentRadians = s_SwerveSubsystem.getPose().getRotation().getRadians();
+        targetAngle = targetTransform.getRotation().getRadians() + currentRadians;
 
         this.thetaController = new ProfiledPIDController(
             SpinCommandConstants.kPThetaController, 0, 0, SpinCommandConstants.kThetaControllerConstraints
         );
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-        s_SwerveSubsystem.zeroGyro();
-        s_SwerveSubsystem.temporarilyStopLocalization = true;
-        s_SwerveSubsystem.resetOdometry(new Pose2d());
-        thetaController.reset(new Pose2d().getRotation().getRadians());
+        thetaController.reset(currentRadians);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class Spin extends Command implements WithStatus {
         System.out.println("Spin: " + currentPose);
 
         double thetaVelocity = thetaController.atGoal() ? 0.0 : 
-            thetaController.calculate(currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+            thetaController.calculate(currentPose.getRotation().getRadians(), targetAngle);
 
         s_SwerveSubsystem.drive(new Translation2d(), thetaVelocity, true);
     }
@@ -77,7 +78,7 @@ public class Spin extends Command implements WithStatus {
     @Override
     public void end(boolean interrupted) {
         isRunning = false;
-        s_SwerveSubsystem.temporarilyStopLocalization = false;
+        s_SwerveSubsystem.toggleLocalization(true);
         s_SwerveSubsystem.drive(new Translation2d(), 0, true);
     }
 

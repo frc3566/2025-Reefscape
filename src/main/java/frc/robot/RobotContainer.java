@@ -12,6 +12,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -45,6 +46,8 @@ import frc.robot.subsystems.Vision;
 
 import java.io.File;
 import java.util.function.BooleanSupplier;
+
+import org.dyn4j.geometry.Transform;
 
 import swervelib.SwerveInputStream;
 
@@ -186,7 +189,11 @@ public class RobotContainer {
       /* Buttons - Climb / Gyro */
 
       driverXbox.a().whileTrue(
-        new Drive(drivebase, () -> new Pose2d(new Translation2d(1, 0), new Rotation2d()))
+        new Drive(drivebase, () -> new Transform2d(new Translation2d(1, 0), new Rotation2d()))
+      );
+
+      driverXbox.y().whileTrue(
+        new Spin(drivebase, () -> new Transform2d(new Translation2d(0, 0), Rotation2d.fromDegrees(90)))
       );
 
       // driverXbox.a().whileTrue(
@@ -202,7 +209,7 @@ public class RobotContainer {
       //   )
       // );
 
-      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      // driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
       // driverXbox.a().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
 
       driverXbox.x().whileTrue(new InstantCommand(() -> {

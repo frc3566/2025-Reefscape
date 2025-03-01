@@ -2,7 +2,7 @@ package frc.robot.commands.swervedrive.auto;
 
 import java.util.List;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -14,14 +14,14 @@ import frc.robot.commands.vision.SupplyAprilTagRobotTransform;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class DriveToHumanRelative extends SequentialCommandGroup {
-    private Pose2d targetPose = new Pose2d();
+    private Transform2d targetTransform = new Transform2d();
 
     public DriveToHumanRelative(SwerveSubsystem swerve) {
         double robotXWidth = Constants.Vision.xWidth;
 
         List<Command> cmds = List.of(
             new SupplyAprilTagRobotTransform((pose) -> {
-                targetPose = new Pose2d(
+                targetTransform = new Transform2d(
                     pose.getTranslation().minus(
                         new Translation2d(
                             robotXWidth * 5 / 8,
@@ -31,10 +31,10 @@ public class DriveToHumanRelative extends SequentialCommandGroup {
                     pose.getRotation()
                 );
 
-                System.out.println(targetPose);
+                System.out.println(targetTransform);
             }, ReefUtil::getTargettingIds),
-            new Drive(swerve, () -> targetPose),
-            new Spin(swerve, () -> targetPose)
+            new Drive(swerve, () -> targetTransform),
+            new Spin(swerve, () -> targetTransform)
         );
 
         addCommands(
