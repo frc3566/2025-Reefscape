@@ -34,7 +34,7 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
                     new Translation2d(
                         robotXWidth,
                         -ReefUtil.adjustY * multiplier
-                    ).unaryMinus().rotateBy(pose.getRotation().unaryMinus()), 
+                    ), 
                     Rotation2d.k180deg
                 ));
 
