@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class GetCoral extends SequentialCommandGroup {
     public GetCoral(Elevator elevator, Intake intake) {
         addCommands(
-            new ElevatorToSetpoint(elevator, 0.75),
-            new PivotToSetpoint(intake, 56.2),
-            new IntakeCoral(intake)
+            new ElevatorToSetpoint(elevator, 0.7),
+            new PivotToSetpoint(intake, 56.2)
+            // new IntakeCoral(intake)
         );
     }
 

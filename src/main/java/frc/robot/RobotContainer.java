@@ -37,7 +37,6 @@ import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.swervedrive.drivebase.Spin;
 import frc.robot.commands.vision.ReefUtil;
 import frc.robot.commands.vision.SupplyAprilTagRobotTransform;
-import frc.robot.subsystems.Algae;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -63,12 +62,12 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController driverXbox2 = new CommandXboxController(1);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
   private final Climber climber = new Climber();
   private final Elevator elevator = new Elevator();
-  private final Algae algae = new Algae();
   private final Intake intake = new Intake();
 
   /**
@@ -160,7 +159,7 @@ public class RobotContainer {
     if (RobotBase.isSimulation()) {
       drivebase.setDefaultCommand(driveFieldOrientedAngularVelocityKeyboard);
     } else {
-      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
+      drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
     }
 
     if (Robot.isSimulation()) {
@@ -246,6 +245,11 @@ public class RobotContainer {
       driverXbox.rightTrigger().onTrue(new InstantCommand(() -> elevator.down()));
       driverXbox.rightTrigger().onFalse(new InstantCommand(() -> elevator.stop()));
 
+      driverXbox.povLeft().onTrue(new InstantCommand(() -> climber.up()));
+      driverXbox.povLeft().onFalse(new InstantCommand(() -> climber.stop()));
+      driverXbox.povRight().onTrue(new InstantCommand(() -> climber.down()));
+      driverXbox.povRight().onFalse(new InstantCommand(() -> climber.stop()));
+
       /* DPad - Coral / Algae */
       driverXbox.povUp().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral out
       driverXbox.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
@@ -253,16 +257,16 @@ public class RobotContainer {
       driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
       driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox.povLeft().onTrue(new InstantCommand(() -> algae.out())); 
-      driverXbox.povLeft().onFalse(new InstantCommand(() -> algae.stop()));
+      driverXbox2.x().whileTrue(new GetCoral(elevator, intake));
+      driverXbox2.y().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
+      driverXbox2.a().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
+      driverXbox2.povLeft().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      driverXbox2.povRight().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
 
-      driverXbox.povRight().onTrue(new InstantCommand(() -> algae.in())); 
-      driverXbox.povRight().onFalse(new InstantCommand(() -> algae.stop()));
-
-      driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 0.66));
-      driverXbox.povUpLeft().whileTrue(new GetCoral(elevator, intake));
-      driverXbox.povDownLeft().whileTrue(new ScoreCoral(elevator, intake, ReefUtil.BranchLevel.L2));
-      driverXbox.povDownRight().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
+      // driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 0.66));
+      // driverXbox.povUpLeft().whileTrue(new GetCoral(elevator, intake));
+      // driverXbox.povDownLeft().whileTrue(new ScoreCoral(elevator, intake, ReefUtil.BranchLevel.L2));
+      // driverXbox.povDownRight().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
     }
   }
 
@@ -274,7 +278,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     // return drivebase.getAutonomousCommand("New Auto");
-    return new Drive(drivebase, () -> new Transform2d(new Translation2d(2, 0), new Rotation2d()));
+    return new PivotToSetpoint(intake, 30)
+      .andThen(new Drive(drivebase, () -> new Transform2d(new Translation2d(1.5, 0), new Rotation2d())));
   }
 
   public void setMotorBrake(boolean brake) {

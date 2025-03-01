@@ -16,10 +16,10 @@ public class ScoreCoral extends SequentialCommandGroup {
                 elevatorSetpoint = 1; intakeSetpoint = 2;
                 break;
             case L2:
-                elevatorSetpoint = 1.55; intakeSetpoint = 112;
+                elevatorSetpoint = 1.55; intakeSetpoint = 114;
                 break; 
             case L3:
-                elevatorSetpoint = 3.04; intakeSetpoint = 112;
+                elevatorSetpoint = 3.1; intakeSetpoint = 114;
                 break;
             case L4:
                 elevatorSetpoint = 1; intakeSetpoint = 2;
@@ -30,8 +30,8 @@ public class ScoreCoral extends SequentialCommandGroup {
             new ParallelCommandGroup(
                 new ElevatorToSetpoint(elevator, elevatorSetpoint),
                 new PivotToSetpoint(intake, intakeSetpoint)
-            ),
-            new DropCoral(intake)
+            )
+            // new DropCoral(intake)
         );
     }
 }
