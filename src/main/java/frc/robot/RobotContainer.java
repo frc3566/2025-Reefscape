@@ -217,7 +217,7 @@ public class RobotContainer {
       //   )
       // );
 
-      // driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
       driverXbox.a().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
 
       driverXbox.x().whileTrue(new InstantCommand(() -> {
@@ -273,7 +273,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     // return drivebase.getAutonomousCommand("New Auto");
-    return null;
+    return new Drive(drivebase, () -> new Transform2d(new Translation2d(2, 0), new Rotation2d()));
   }
 
   public void setMotorBrake(boolean brake) {
