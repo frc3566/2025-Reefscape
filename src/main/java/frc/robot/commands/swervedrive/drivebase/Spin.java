@@ -32,7 +32,7 @@ public class Spin extends Command implements WithStatus {
     private static class SpinCommandConstants {
         public static final double kMaxAngularSpeedRadiansPerSecond = 2.5 * Math.PI; 
         public static final double kMaxAngularSpeedRadiansPerSecondSquared =  2.25 * Math.PI; 
-        public static final double kPThetaController = 5; //6
+        public static final double kPThetaController = 6.5;
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared
