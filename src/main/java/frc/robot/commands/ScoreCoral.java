@@ -6,7 +6,7 @@ import frc.robot.commands.vision.ReefUtil;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 public class ScoreCoral extends SequentialCommandGroup {
     public ScoreCoral(Elevator elevator, Intake intake, ReefUtil.BranchLevel level) {
@@ -27,14 +27,11 @@ public class ScoreCoral extends SequentialCommandGroup {
         }
 
         addCommands(
-            new ElevatorToSetpoint(elevator, elevatorSetpoint),
-            new PivotToSetpoint(intake, intakeSetpoint)
-            // new InstantCommand(() -> intake.runIntake(false)),
-            // new WaitCommand(1),
-            // new InstantCommand(() -> intake.stopIntake())
-            // new PivotToSetpoint(intake, 0),
-            // new ElevatorToSetpoint(elevator, 1)
+            new ParallelCommandGroup(
+                new ElevatorToSetpoint(elevator, elevatorSetpoint),
+                new PivotToSetpoint(intake, intakeSetpoint)
+            ),
+            new DropCoral(intake)
         );
     }
-
 }
