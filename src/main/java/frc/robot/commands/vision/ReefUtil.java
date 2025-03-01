@@ -6,8 +6,13 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class ReefUtil {
+    public static final double adjustY = Units.inchesToMeters(6.469);
     public enum LeftRight {
         LEFT, RIGHT
+    }
+
+    public enum BranchLevel {
+        TROUGH, L2, L3, L4
     }
 
     public static List<Integer> getTargettingIds() {
@@ -17,6 +22,4 @@ public class ReefUtil {
             return List.of(6, 7, 8, 9, 10, 11);
         }
     }
-
-    public static final double adjustY = Units.inchesToMeters(6.469);
 }

@@ -31,7 +31,7 @@ public class Drive extends Command implements WithStatus {
     private boolean isRunning;
 
     private static class DriveCommandConstants {
-        public static final double kPXController = 4; //8
+        public static final double kPXController = 6; //5
         public static final double kMaxSpeedMetersPerSecond = 4; //5
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     }
@@ -82,7 +82,6 @@ public class Drive extends Command implements WithStatus {
     @Override
     public void end(boolean interrupted) {
         isRunning = false;
-        s_SwerveSubsystem.toggleLocalization(true);
         s_SwerveSubsystem.drive(new Translation2d(), 0, true);
     }
 

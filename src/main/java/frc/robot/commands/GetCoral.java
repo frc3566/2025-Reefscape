@@ -12,6 +12,7 @@ public class GetCoral extends SequentialCommandGroup {
         addCommands(
             new ElevatorToSetpoint(elevator, 0.75),
             new PivotToSetpoint(intake, 56.2),
+            // TODO: the intake is not stopping?
             new InstantCommand(() -> intake.runIntake(true)),
             new WaitCommand(2.5),
             new InstantCommand(() -> intake.stopIntake())

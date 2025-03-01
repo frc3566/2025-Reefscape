@@ -158,7 +158,7 @@ public class RobotContainer {
     Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
     if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocityKeyboard);
     } else {
       drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     }
@@ -180,6 +180,14 @@ public class RobotContainer {
     } else {
       // TELEOP HERE
       // TODO: Refactor with suppliers?
+
+      /*
+       * Keyboard simulation controls:
+       * z -> a()
+       * x -> b()
+       * c -> x()
+       * v -> y()
+       */
 
       // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
       // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
@@ -252,8 +260,8 @@ public class RobotContainer {
 
       driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 0.66));
       driverXbox.povUpLeft().whileTrue(new GetCoral(elevator, intake));
-      driverXbox.povDownLeft().whileTrue(new ScoreCoral(elevator, intake, 2));
-      driverXbox.povDownRight().whileTrue(new ScoreCoral(elevator, intake ,3));
+      driverXbox.povDownLeft().whileTrue(new ScoreCoral(elevator, intake, ReefUtil.BranchLevel.L2));
+      driverXbox.povDownRight().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
     }
   }
 
