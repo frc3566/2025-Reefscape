@@ -21,7 +21,6 @@ public class ElevatorToSetpoint extends Command {
         controller = new ProfiledPIDController(8, 0, 0.8, new Constraints(1, 0.5)); //TODO: change values, these are generic
         controller.setTolerance(0.02);
         // controller.reset(elevator.getHeightMeters()); //TODO: figure out reset
-        
         addRequirements(elevator);
         // Use addRequirements() here to declare subsystem dependencies.
         // Configure additional PID options by calling `getController` here.
@@ -29,7 +28,11 @@ public class ElevatorToSetpoint extends Command {
 
     // Called when the command is initially scheduled.
     @Override
-    public void initialize() {
+    public void initialize() 
+    {
+        controller.reset(elevator.getHeightMeters());
+        // controller.reset(elevator.getHeightMeters() - 0);
+        controller.setGoal(setpoint);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
