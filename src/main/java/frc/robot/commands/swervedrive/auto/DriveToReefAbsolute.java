@@ -84,12 +84,4 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
         //     return (WithStatus) command;
         // }).anyMatch(WithStatus::isRunning);
     }
-
-    public static List<Integer> getTargettingIds() {
-        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
-            return List.of(17, 18, 19, 20, 21, 22);
-        } else {
-            return List.of(6, 7, 8, 9, 10, 11);
-        }
-    }
 }
