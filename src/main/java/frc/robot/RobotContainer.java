@@ -45,6 +45,7 @@ import frc.robot.subsystems.Vision;
 
 import java.io.File;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import org.dyn4j.geometry.Transform;
 
@@ -70,13 +71,17 @@ public class RobotContainer {
   private final Elevator elevator = new Elevator();
   private final Intake intake = new Intake();
 
+  Rotation2d headingOffset = new Rotation2d();
+
+  Supplier<Rotation2d> headingOffsetSupplier = () -> headingOffset;
+
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
    * by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> driverXbox.getLeftY() * -1,
-      () -> driverXbox.getLeftX() * -1)
+      () -> new Translation2d(driverXbox.getLeftX() * -1, driverXbox.getLeftY() * -1).rotateBy(headingOffsetSupplier.get()).getY(),
+      () -> new Translation2d(driverXbox.getLeftX() * -1, driverXbox.getLeftY() * -1).rotateBy(headingOffsetSupplier.get()).getX())
       .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
@@ -98,8 +103,8 @@ public class RobotContainer {
       .allianceRelativeControl(false);
 
   SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> driverXbox.getLeftY(),
-      () -> driverXbox.getLeftX())
+      () -> new Translation2d(driverXbox.getLeftX() * -1, driverXbox.getLeftY() * -1).rotateBy(headingOffsetSupplier.get()).getY(),
+      () -> new Translation2d(driverXbox.getLeftX() * -1, driverXbox.getLeftY() * -1).rotateBy(headingOffsetSupplier.get()).getX())
       .withControllerRotationAxis(() -> driverXbox.getRawAxis(
           2))
       .deadband(OperatorConstants.DEADBAND)
@@ -159,7 +164,7 @@ public class RobotContainer {
     if (RobotBase.isSimulation()) {
       drivebase.setDefaultCommand(driveFieldOrientedAngularVelocityKeyboard);
     } else {
-      drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     }
 
     if (Robot.isSimulation()) {
@@ -191,7 +196,13 @@ public class RobotContainer {
       // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
       // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
 
-      driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+
+      driverXbox.b().onTrue((new InstantCommand( () -> {
+        Rotation2d heading = drivebase.getPose().getRotation();
+        System.out.print(heading.k180deg.minus(heading));
+        headingOffset = heading.k180deg.minus(heading);
+      })));
       
       /* Buttons - Climb / Gyro */
 

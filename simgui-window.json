@@ -28,13 +28,13 @@
     },
     "###FMS": {
       "Collapsed": "0",
-      "Pos": "4,414",
-      "Size": "169,184"
+      "Pos": "58,344",
+      "Size": "283,140"
     },
     "###Joysticks": {
       "Collapsed": "0",
       "Pos": "250,465",
-      "Size": "796,189"
+      "Size": "796,172"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -58,13 +58,13 @@
     },
     "###System Joysticks": {
       "Collapsed": "0",
-      "Pos": "205,308",
+      "Pos": "517,365",
       "Size": "192,218"
     },
     "###Timing": {
       "Collapsed": "0",
       "Pos": "5,150",
-      "Size": "135,219"
+      "Size": "135,196"
     },
     "Debug##Default": {
       "Collapsed": "0",
@@ -74,7 +74,7 @@
     "Robot State": {
       "Collapsed": "0",
       "Pos": "7,20",
-      "Size": "92,116"
+      "Size": "99,116"
     }
   }
 }
