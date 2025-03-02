@@ -23,6 +23,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -50,6 +51,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveInputStream;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -189,7 +191,7 @@ public class SwerveSubsystem extends SubsystemBase {
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic
               // drive trains
-              new PIDConstants(5.0, 0.0, 0.0),
+              new PIDConstants(15, 0.0, 0.01),
               // Translation PID constants
               new PIDConstants(5.0, 0.0, 0.0)
           // Rotation PID constants
@@ -503,9 +505,29 @@ public class SwerveSubsystem extends SubsystemBase {
    *
    * @param velocity Robot oriented {@link ChassisSpeeds}
    */
+
+   public Command drive(Supplier<ChassisSpeeds> velocity) {
+    return run(() -> {
+      swerveDrive.drive(velocity.get());
+    });
+  }
+
+
   public void drive(ChassisSpeeds velocity) {
     swerveDrive.drive(velocity);
   }
+
+  public void driveFieldOrientedAndRobotOriented(ChassisSpeeds velocity, ChassisSpeeds velocity2) {
+    swerveDrive.driveFieldOrientedAndRobotOriented(velocity, velocity2);
+  }
+
+  public Command driveFieldOrientedAndRobotOriented(Supplier<ChassisSpeeds> velocity, Supplier<ChassisSpeeds> velocity2) {
+    return run(() -> {
+      swerveDrive.driveFieldOrientedAndRobotOriented(velocity.get(), velocity2.get());
+    });
+  }
+
+
 
   /**
    * Get the swerve drive kinematics object.
@@ -564,6 +586,18 @@ public class SwerveSubsystem extends SubsystemBase {
   public void zeroGyro() {
     System.out.println("Zeroing gyro");
     swerveDrive.zeroGyro();
+  }
+
+  public void getGyro() {
+
+  }
+
+  public void setGyroOffset() {
+    Rotation2d temp = new Rotation2d(swerveDrive.getGyroRotation3d().getZ());
+    System.out.println("Measured Gyro Rotation: " + temp);
+    // swerveDrive.setGyro(swerveDrive.getGyroRotation3d().minus(new Rotation3d(new Rotation2d(swerveDrive.getGyroRotation3d().getZ()))));
+    resetOdometry(new Pose2d(getPose().getTranslation(), temp));
+    swerveDrive.setGyro(swerveDrive.getGyroRotation3d());
   }
 
   /**
@@ -722,4 +756,5 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
   }
+
 }

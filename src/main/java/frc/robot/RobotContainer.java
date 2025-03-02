@@ -90,6 +90,8 @@ public class RobotContainer {
       driverXbox::getRightY)
       .headingWhile(true);
 
+  // SwerveInputStream driveGyroOffset = driveAngularVelocity.copy().headingOffset(true).headingOffset(drivebase.getGyro()) //Plug in rotation supplier?
+
   /**
    * Clone's the angular velocity input stream and converts it to a robotRelative
    * input stream.
@@ -98,14 +100,17 @@ public class RobotContainer {
       .allianceRelativeControl(false);
 
   SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> driverXbox.getLeftY(),
-      () -> driverXbox.getLeftX())
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
       .withControllerRotationAxis(() -> driverXbox.getRawAxis(
-          2))
+          2) * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
+      .allianceRelativeControl(false);
   // Derive the heading axis with math!
+
+  SwerveInputStream driveRobotOrientedKeyboard = driveAngularVelocityKeyboard.copy().robotRelative(true).allianceRelativeControl(false);
+
   SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
       .withControllerHeadingAxis(() -> Math.sin(
           driverXbox.getRawAxis(
@@ -154,12 +159,13 @@ public class RobotContainer {
     Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
     Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
     Command driveFieldOrientedAngularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+    Command driveRobotOrientedAngularVelocityKeyboard = drivebase.driveFieldOriented(driveRobotOrientedKeyboard);
     Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
     if (RobotBase.isSimulation()) {
       drivebase.setDefaultCommand(driveFieldOrientedAngularVelocityKeyboard);
     } else {
-      drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+      drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     }
 
     if (Robot.isSimulation()) {
@@ -191,7 +197,8 @@ public class RobotContainer {
       // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
       // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
 
-      driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // driverXbox.b().onTrue((Commands.runOnce(drivebase::setGyroOffset)));
+      driverXbox.b().whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d(3, 7), new Rotation2d())));
       
       /* Buttons - Climb / Gyro */
 
