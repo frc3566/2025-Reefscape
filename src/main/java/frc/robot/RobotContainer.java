@@ -198,7 +198,7 @@ public class RobotContainer {
       // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
 
       // driverXbox.b().onTrue((Commands.runOnce(drivebase::setGyroOffset)));
-      driverXbox.b().whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d(3, 7), new Rotation2d())));
+      driverXbox.b().whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d(10, 4), Rotation2d.fromDegrees(90))));
       
       /* Buttons - Climb / Gyro */
 

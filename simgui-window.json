@@ -11,8 +11,8 @@
       "style": "0",
       "userScale": "2",
       "width": "1280",
-      "xpos": "146",
-      "ypos": "826"
+      "xpos": "124",
+      "ypos": "787"
     }
   },
   "Window": {
@@ -23,8 +23,8 @@
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "Pos": "166,24",
-      "Size": "740,373"
+      "Pos": "166,25",
+      "Size": "740,372"
     },
     "###FMS": {
       "Collapsed": "0",
