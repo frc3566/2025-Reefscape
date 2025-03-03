@@ -190,10 +190,10 @@ public class RobotContainer {
        * v -> y()
        */
 
-      // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
-      // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
+      driverXbox.y().whileTrue(drivebase.sysIdDriveMotorCommand());
+      driverXbox.a().whileTrue(drivebase.sysIdAngleMotorCommand());
 
-      driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       
       /* Buttons - Climb / Gyro */
 

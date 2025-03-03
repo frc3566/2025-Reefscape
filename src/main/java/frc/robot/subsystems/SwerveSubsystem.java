@@ -339,7 +339,7 @@ public class SwerveSubsystem extends SubsystemBase {
     return SwerveDriveTest.generateSysIdCommand(
         SwerveDriveTest.setDriveSysIdRoutine(
             new Config(),
-            this, swerveDrive, 12, false),
+            this, swerveDrive, 12, true),
         3.0, 5.0, 3.0);
   }
 
