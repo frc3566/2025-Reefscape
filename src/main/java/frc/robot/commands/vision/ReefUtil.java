@@ -11,6 +11,10 @@ public class ReefUtil {
         LEFT, RIGHT
     }
 
+    public enum Side {
+        DS, DSLEFT, DSRIGHT, BARGE, BARGELEFT, BARGERIGHT
+    }
+
     public enum BranchLevel {
         TROUGH, L2, L3, L4
     }
