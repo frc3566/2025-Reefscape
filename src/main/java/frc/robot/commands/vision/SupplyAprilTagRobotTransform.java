@@ -29,7 +29,7 @@ public class SupplyAprilTagRobotTransform extends Command implements WithStatus 
         this.setTargetPose = setTargetTransform;
         this.targetIds = targetIds;
 
-        System.out.println(targetIds);
+        System.out.println("Targetting ids: " + targetIds.get());
     }
 
     @Override

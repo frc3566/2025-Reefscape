@@ -80,7 +80,7 @@ public class RobotContainer {
       .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
-      .allianceRelativeControl(false);
+      .allianceRelativeControl(true);
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative
@@ -191,7 +191,7 @@ public class RobotContainer {
       // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
       // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
 
-      driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      // driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       
       /* Buttons - Climb / Gyro */
 

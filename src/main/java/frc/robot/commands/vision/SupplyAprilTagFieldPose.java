@@ -28,7 +28,7 @@ public class SupplyAprilTagFieldPose extends Command implements WithStatus {
         this.setTargetPose = setTargetPose;
         this.targetIds = targetIds;
 
-        System.out.println(targetIds);
+        System.out.println("Targetting ids: " + targetIds.get());
     }
 
     @Override
