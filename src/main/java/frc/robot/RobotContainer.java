@@ -106,7 +106,7 @@ public class RobotContainer {
           2) * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
-      .allianceRelativeControl(false);
+      .allianceRelativeControl(true);
   // Derive the heading axis with math!
 
   SwerveInputStream driveRobotOrientedKeyboard = driveAngularVelocityKeyboard.copy().robotRelative(true).allianceRelativeControl(false);
@@ -197,7 +197,7 @@ public class RobotContainer {
       // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
       // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
 
-      // driverXbox.b().onTrue((Commands.runOnce(drivebase::setGyroOffset)));
+      // driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.b().whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d(10, 4), Rotation2d.fromDegrees(90))));
       
       /* Buttons - Climb / Gyro */
