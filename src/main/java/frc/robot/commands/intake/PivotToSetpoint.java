@@ -14,8 +14,8 @@ public class PivotToSetpoint extends Command {
         this.m_Intake = m_Intake;
         this.setpoint = setpoint + Constants.PIVOT_OFFSET;
         addRequirements(m_Intake);
-        m_Controller = new PIDController(0.05, 0, 0.001); //TODO: monitor values for accuracy
-        m_Controller.setTolerance(1.5);
+        m_Controller = new PIDController(0.05, 0, 0.0015); //TODO: monitor values for accuracy
+        m_Controller.setTolerance(2);
 
 
 

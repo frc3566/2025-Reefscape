@@ -77,7 +77,7 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+      .withControllerRotationAxis(() -> driverXbox.getRightX()) //Fix inversion
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
@@ -191,7 +191,7 @@ public class RobotContainer {
       // driverXbox.y().onTrue(drivebase.sysIdDriveMotorCommand());
       // driverXbox.a().onTrue(drivebase.sysIdAngleMotorCommand());
 
-      // driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverXbox.b().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       
       /* Buttons - Climb / Gyro */
 
@@ -258,8 +258,9 @@ public class RobotContainer {
       driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
       driverXbox2.x().whileTrue(new GetCoral(elevator, intake));
-      driverXbox2.y().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
-      driverXbox2.b().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
+      driverXbox2.y().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L4));
+      driverXbox2.b().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
+      driverXbox2.a().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
       driverXbox2.povLeft().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
       driverXbox2.povRight().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
 
