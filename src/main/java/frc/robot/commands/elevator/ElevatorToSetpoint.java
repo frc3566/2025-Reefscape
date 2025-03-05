@@ -18,7 +18,7 @@ public class ElevatorToSetpoint extends Command {
         this.elevator = elevator;
         this.setpoint = setpoint + Constants.ELEVATOR_OFFSET;
         feedForward = new ElevatorFeedforward(0.22683, 0, 0.678, 0.0053266); //TODO: do kG and test kS, kV, kA
-        controller = new ProfiledPIDController(9, 0, 0.5, new Constraints(3, 1.5)); //TODO: change values, these are generic
+        controller = new ProfiledPIDController(10, 0, 0.5, new Constraints(3.5, 2)); //TODO: change values, these are generic
         controller.setTolerance(0.06);
         // controller.reset(elevator.getHeightMeters() - setpoint);
         // controller.setGoal(setpoint); 
