@@ -15,9 +15,9 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class OneCoral extends SequentialCommandGroup{
     public OneCoral(SwerveSubsystem swerve, Elevator elevator, Intake intake) {
         List<Command> cmds = List.of(
-            new DriveToReefAbsolute(swerve, ReefUtil.LeftRight.LEFT)
-                .alongWith(new ElevatorToSetpoint(elevator, 0 /* TODO */))
-                .alongWith(new PivotToSetpoint(intake, 0 /* TODO */))
+            // new DriveToReefAbsolute(swerve, ReefUtil.LeftRight.LEFT)
+            //     .alongWith(new ElevatorToSetpoint(elevator, 0 /* TODO */))
+            //     .alongWith(new PivotToSetpoint(intake, 0 /* TODO */))
         );
     }
 }

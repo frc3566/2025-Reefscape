@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
@@ -32,7 +33,7 @@ public class DriveToHumanRelative extends SequentialCommandGroup {
                 );
 
                 System.out.println(targetTransform);
-            }, ReefUtil::getTargettingIds),
+            }, DriveToHumanRelative::getTargettingIds),
             new Drive(swerve, () -> targetTransform),
             new Spin(swerve, () -> targetTransform)
         );
@@ -40,5 +41,13 @@ public class DriveToHumanRelative extends SequentialCommandGroup {
         addCommands(
             cmds.toArray(Command[]::new)
         );
+    }
+
+    public static List<Integer> getTargettingIds() {
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
+            return List.of(12, 13);
+        } else {
+            return List.of(1, 2);
+        }
     }
 }

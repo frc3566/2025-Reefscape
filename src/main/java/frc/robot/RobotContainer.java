@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -44,6 +45,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
 import java.io.File;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import org.dyn4j.geometry.Transform;
@@ -207,18 +209,11 @@ public class RobotContainer {
       //   new Spin(drivebase, () -> new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(90)))
       // );
 
-      // driverXbox.y().whileTrue(
-      //   new SequentialCommandGroup(
-      //     new InstantCommand(() -> {
-      //       drivebase.resetOdometry(new Pose2d());
-      //     }),
-      //     drivebase.driveToPose(new Pose2d(new Translation2d(1, 0), new Rotation2d()))
-      //   )
+      // driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
+      // driverXbox.a().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      // driverXbox.a().whileTrue(
+      //   new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSLEFT, ReefUtil.LeftRight.LEFT)
       // );
-
-      driverXbox.y().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
-      driverXbox.a().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
-      // driverXbox.a().whileTrue(new DriveToReefAbsolute(this.drivebase, ReefUtil.LeftRight.LEFT));
 
       driverXbox.x().whileTrue(new InstantCommand(() -> {
         System.out.println("pressed x");
@@ -261,14 +256,25 @@ public class RobotContainer {
       driverXbox2.y().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L4));
       driverXbox2.b().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
       driverXbox2.a().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
-      driverXbox2.povLeft().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
-      driverXbox2.povRight().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
+      // driverXbox2.povLeft().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
+      // driverXbox2.povRight().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
 
-      driverXbox2.povUp().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral out
-      driverXbox2.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
+      // driverXbox2.povUp().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral out
+      // driverXbox2.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
+      // driverXbox2.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
+      // driverXbox2.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox2.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
-      driverXbox2.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
+      // driverXbox2.povDown().and(driverXbox2.x()).onTrue(
+      //   new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSLEFT, ReefUtil.LeftRight.LEFT)
+      // );
+
+      driverXbox2.povLeft().whileTrue(
+        new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
+      );
+
+      driverXbox2.povUp().whileTrue(
+        new DeferredCommand(() -> drivebase.driveToPose(drivebase.getPose().plus(new Transform2d(new Translation2d(1, 0), new Rotation2d()))), Set.of(drivebase))
+      );
 
       // driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 0.66));
       // driverXbox.povUpLeft().whileTrue(new GetCoral(elevator, intake));

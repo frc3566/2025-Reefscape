@@ -2,6 +2,7 @@ package frc.robot.commands.vision;
 
 import java.util.List;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -12,7 +13,26 @@ public class ReefUtil {
     }
 
     public enum Side {
-        DS, DSLEFT, DSRIGHT, BARGE, BARGELEFT, BARGERIGHT
+        DS(new Pair<>(18, 7)), 
+        DSLEFT(new Pair<>(19, 6)), 
+        DSRIGHT(new Pair<>(17, 8)), 
+        BARGE(new Pair<>(21, 10)), 
+        BARGELEFT(new Pair<>(20, 11)), 
+        BARGERIGHT(new Pair<>(22, 9));
+
+        private Pair<Integer, Integer> targettingIds;
+        
+        private Side(Pair<Integer, Integer> targettingIds) {
+            this.targettingIds = targettingIds;
+        }
+
+        public int getTargettingId() {
+            if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
+                return targettingIds.getFirst();
+            } else {
+                return targettingIds.getSecond();
+            }
+        }
     }
 
     public enum BranchLevel {

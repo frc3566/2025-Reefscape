@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.TargetingSystem;
 import frc.robot.Constants;
@@ -16,6 +17,7 @@ import frc.robot.commands.vision.ReefUtil;
 import frc.robot.commands.vision.SupplyAprilTagFieldPose;
 import frc.robot.commands.vision.ReefUtil.LeftRight;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Vision;
 
 import java.util.List;
 import java.util.Set;
@@ -24,12 +26,14 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
     private List<Command> commandsWithStatus;
     private Pose2d targetPose = new Pose2d();
 
-    public DriveToReefAbsolute(SwerveSubsystem swerve, LeftRight side) {
+    public DriveToReefAbsolute(SwerveSubsystem swerve, ReefUtil.Side hexagonSide, ReefUtil.LeftRight side) {
         double multiplier = side == LeftRight.LEFT ? 1 : -1;
         double robotXWidth = Constants.Vision.xWidth;
 
         commandsWithStatus = List.of(
-            new SupplyAprilTagFieldPose((pose) -> {
+            new InstantCommand(() -> {
+                System.out.println("Going to AprilTag " + hexagonSide.getTargettingId());
+                var pose = Vision.getAprilTagPose(hexagonSide.getTargettingId(), new Transform2d());
                 targetPose = pose.transformBy(new Transform2d(
                     new Translation2d(
                         robotXWidth,
@@ -37,9 +41,11 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
                     ), 
                     Rotation2d.k180deg
                 ));
+                
+                System.out.println("AprilTag pose: " + pose);
 
                 System.out.println(targetPose);
-            }, ReefUtil::getTargettingIds),
+            }),
             new DeferredCommand(() -> swerve.driveToPose(targetPose), Set.of(swerve))
         );
 

@@ -117,7 +117,6 @@ public class Vision {
     } else {
       throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
     }
-
   }
 
   /** 
@@ -502,11 +501,22 @@ public class Vision {
       double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
       double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
       double debounceTime = Milliseconds.of(15).in(Seconds);
+
       for (PhotonPipelineResult result : resultsList) {
         mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
       }
+
+      System.out.println("Result timestamps: " + resultsList.stream().map(e -> e.getTimestampSeconds()).toList());
+
+      System.out.println("Most recent: " + mostRecentTimestamp + " Last read: " + lastReadTimestamp + " Current: " + currentTimestamp);
+
+      /* 
+        this function is not getting ran because mostRecentTimestamp > currentTimestamp by a lot
+        most likely mostRecentTimeStamp is wrong
+      */
       if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
           (currentTimestamp - lastReadTimestamp) >= debounceTime) {
+        System.out.println("Camera readings: " + camera.getAllUnreadResults());
         resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
         lastReadTimestamp = currentTimestamp;
         resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
@@ -516,6 +526,14 @@ public class Vision {
           updateEstimatedGlobalPose();
         }
       }
+
+      // resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+      // resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
+      //   return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
+      // });
+      // if (!resultsList.isEmpty()) {
+      //   updateEstimatedGlobalPose();
+      // }
     }
 
     /**
@@ -538,6 +556,7 @@ public class Vision {
         visionEst = poseEstimator.update(change);
         updateEstimationStdDevs(visionEst, change.getTargets());
       }
+      System.out.println("Localization estimation: " + visionEst);
       estimatedRobotPose = visionEst;
     }
 
