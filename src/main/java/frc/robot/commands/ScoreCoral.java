@@ -22,7 +22,7 @@ public class ScoreCoral extends SequentialCommandGroup {
                 elevatorSetpoint = 3.1; intakeSetpoint = 110;
                 break;
             case L4:
-                elevatorSetpoint = 4.87; intakeSetpoint = 92;
+                elevatorSetpoint = 4.83; intakeSetpoint = 92;
                 break;
         }
 
