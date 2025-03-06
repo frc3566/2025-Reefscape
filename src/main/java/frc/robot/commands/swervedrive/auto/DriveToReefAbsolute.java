@@ -32,19 +32,19 @@ public class DriveToReefAbsolute extends SequentialCommandGroup implements WithS
 
         commandsWithStatus = List.of(
             new InstantCommand(() -> {
-                System.out.println("Going to AprilTag " + hexagonSide.getTargettingId());
-                var pose = Vision.getAprilTagPose(hexagonSide.getTargettingId(), new Transform2d());
-                targetPose = pose.transformBy(new Transform2d(
-                    new Translation2d(
-                        robotXWidth,
-                        -ReefUtil.adjustY * multiplier
-                    ), 
-                    Rotation2d.k180deg
-                ));
+                //System.out.println("Going to AprilTag " + hexagonSide.getTargettingId());
+                //var pose = Vision.getAprilTagPose(hexagonSide.getTargettingId(), new Transform2d());
+                //targetPose = pose.transformBy(new Transform2d(
+                //    new Translation2d(
+                //        robotXWidth,
+                //        -ReefUtil.adjustY * multiplier
+                //    ), 
+                //    Rotation2d.k180deg
+                //));
                 
-                System.out.println("AprilTag pose: " + pose);
+                //System.out.println("AprilTag pose: " + pose);
 
-                System.out.println(targetPose);
+                //System.out.println(targetPose);
             }),
             new DeferredCommand(() -> swerve.driveToPose(targetPose), Set.of(swerve))
         );

@@ -19,8 +19,12 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Constants;
@@ -402,7 +406,7 @@ public class Vision {
     ) {
       latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
 
-      camera = new PhotonCamera(name);
+      camera = new PhotonCamera( name);
 
       // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
       robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
@@ -497,35 +501,87 @@ public class Vision {
      * Update the latest results, cached with a maximum refresh rate of 1req/15ms.
      * Sorts the list by timestamp.
      */
-    public void updateUnreadResults() {
-      double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
-      double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
-      double debounceTime = Milliseconds.of(15).in(Seconds);
+    
 
-      for (PhotonPipelineResult result : resultsList) {
-        mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
+    double lastVisionUpdatedOn = 0;
+    double ignoreReadingsOlderThan = Milliseconds.of(15).in(Seconds);
+    double debounceTime = Milliseconds.of(1000).in(Seconds);
+
+    // The FPGA timestamp the first time we first got a vision read
+    double firstFpgaTimestampAtTheTimeOfFirstVIsionRead = 0;
+    // The timestamp of the first read result from the camera
+    double firstVisionReadTimestamp;
+
+    public void updateUnreadResults() {
+      double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+
+
+      // New logic here to only run the update vision every <MdebounceTime> seconds      
+      if(currentTimestamp - lastVisionUpdatedOn > debounceTime) {
+        // We should only get in here once every <debuounceTime> seconds, this helps with logging and acts as a rate limiter
+        System.out.println("Starting to process vision");
+
+        System.out.println("JNI Time: " + Microseconds.of(NetworkTablesJNI.now()).in(Seconds));
+        System.out.println("FPGA Time: " + Microseconds.of(Timer.getFPGATimestamp()).in(Seconds));
+        
+        // Enter a record into the vision networktable to get the timestamp
+        camera.getCameraTable().putValue("visionNtTimestamp", NetworkTableValue.makeDouble(Timer.getFPGATimestamp()));
+        var visionNtEntry = camera.getCameraTable().getValue("visionNtTimestamp");
+        var visionNtTime = Microseconds.of(visionNtEntry.getTime()).in(Seconds);
+        System.out.println("Vision NT Time: " + visionNtTime);
+
+        resultsList.clear();
+        //if(!resultsList.isEmpty()) {
+          resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+          
+          double mostRecentResultTimestamp = -1;
+          for (PhotonPipelineResult result : resultsList) {
+            mostRecentResultTimestamp = Math.max(mostRecentResultTimestamp, result.getTimestampSeconds());
+
+            //System.out.println("Result timestamp: " + result.getTimestampSeconds());
+            //System.out.println("Result is: " + result.getBestTarget().getFiducialId());
+          }
+
+          System.out.println("Most recent result: " + mostRecentResultTimestamp);
+          System.out.println("Number of results: " + resultsList.size());
+        //}
+
+        //System.out.println("Camera readings: " + camera.getAllUnreadResults());
+        //resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+        //resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
+        //  return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
+        //});
+        //if (!resultsList.isEmpty()) {
+        //  updateEstimatedGlobalPose();
+       // }
+
+        lastVisionUpdatedOn = currentTimestamp;
       }
 
-      System.out.println("Result timestamps: " + resultsList.stream().map(e -> e.getTimestampSeconds()).toList());
+      //double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
+      //for (PhotonPipelineResult result : resultsList) {
+      //  mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
+      //}
 
-      System.out.println("Most recent: " + mostRecentTimestamp + " Last read: " + lastReadTimestamp + " Current: " + currentTimestamp);
-
+      //System.out.println("Result timestamps: " + resultsList.stream().map(e -> e.getTimestampSeconds()).toList());
+      //System.out.println("Most recent: " + mostRecentTimestamp + " Last read: " + lastReadTimestamp + " Current: " + currentTimestamp);
+      
       /* 
         this function is not getting ran because mostRecentTimestamp > currentTimestamp by a lot
         most likely mostRecentTimeStamp is wrong
       */
-      if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
-          (currentTimestamp - lastReadTimestamp) >= debounceTime) {
-        System.out.println("Camera readings: " + camera.getAllUnreadResults());
-        resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
-        lastReadTimestamp = currentTimestamp;
-        resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
-          return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
-        });
-        if (!resultsList.isEmpty()) {
-          updateEstimatedGlobalPose();
-        }
-      }
+      //if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
+      //    (currentTimestamp - lastReadTimestamp) >= debounceTime) {
+      //  //System.out.println("Camera readings: " + camera.getAllUnreadResults());
+      //  resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+      //  lastReadTimestamp = currentTimestamp;
+      //  resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
+      //    return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
+      //  });
+      //  if (!resultsList.isEmpty()) {
+      //    updateEstimatedGlobalPose();
+      //  }
+      //}
 
       // resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
       // resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
@@ -556,7 +612,7 @@ public class Vision {
         visionEst = poseEstimator.update(change);
         updateEstimationStdDevs(visionEst, change.getTargets());
       }
-      System.out.println("Localization estimation: " + visionEst);
+      //System.out.println("Localization estimation: " + visionEst);
       estimatedRobotPose = visionEst;
     }
 
