@@ -48,8 +48,6 @@ import java.io.File;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
-import org.dyn4j.geometry.Transform;
-
 import swervelib.SwerveInputStream;
 
 /**
@@ -77,8 +75,8 @@ public class RobotContainer {
    * by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> driverXbox.getLeftY(),
-      () -> -driverXbox.getLeftX())
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
       .withControllerRotationAxis(() -> driverXbox.getRightX() * -1) //Fix inversion
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
@@ -252,10 +250,10 @@ public class RobotContainer {
       driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
       driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox2.x().whileTrue(new GetCoral(elevator, intake));
-      driverXbox2.y().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L4));
-      driverXbox2.b().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
-      driverXbox2.a().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
+      // driverXbox2.x().whileTrue(new GetCoral(elevator, intake));
+      // driverXbox2.y().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L4));
+      // driverXbox2.b().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
+      // driverXbox2.a().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
       // driverXbox2.povLeft().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
       // driverXbox2.povRight().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
 
@@ -270,10 +268,6 @@ public class RobotContainer {
 
       driverXbox2.povLeft().whileTrue(
         new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
-      );
-
-      driverXbox2.povUp().whileTrue(
-        new DeferredCommand(() -> drivebase.driveToPose(drivebase.getPose().plus(new Transform2d(new Translation2d(1, 0), new Rotation2d()))), Set.of(drivebase))
       );
 
       // driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 0.66));

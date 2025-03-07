@@ -506,9 +506,9 @@ public class Vision {
         mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
       }
 
-      System.out.println("Result timestamps: " + resultsList.stream().map(e -> e.getTimestampSeconds()).toList());
+      // System.out.println("Result timestamps: " + resultsList.stream().map(e -> e.getTimestampSeconds()).toList());
 
-      System.out.println("Most recent: " + mostRecentTimestamp + " Last read: " + lastReadTimestamp + " Current: " + currentTimestamp);
+      // System.out.println("Most recent: " + mostRecentTimestamp + " Last read: " + lastReadTimestamp + " Current: " + currentTimestamp);
 
       /* 
         this function is not getting ran because mostRecentTimestamp > currentTimestamp by a lot
@@ -516,7 +516,7 @@ public class Vision {
       */
       if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
           (currentTimestamp - lastReadTimestamp) >= debounceTime) {
-        System.out.println("Camera readings: " + camera.getAllUnreadResults());
+        // System.out.println("Camera readings: " + camera.getAllUnreadResults());
         resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
         lastReadTimestamp = currentTimestamp;
         resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
@@ -556,7 +556,7 @@ public class Vision {
         visionEst = poseEstimator.update(change);
         updateEstimationStdDevs(visionEst, change.getTargets());
       }
-      System.out.println("Localization estimation: " + visionEst);
+      System.out.println("Localization estimation: " + visionEst.map(e -> e.estimatedPose.toPose2d()));
       estimatedRobotPose = visionEst;
     }
 

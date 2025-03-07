@@ -262,6 +262,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return PathFinding command
    */
   public Command driveToPose(Pose2d pose) {
+    System.out.println("Current pose: " + this.getPose());
     System.out.println("Driving to absolute pose: " + pose);
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
