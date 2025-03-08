@@ -412,7 +412,10 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     // return drivebase.getAutonomousCommand("New Auto");
-    return new LeftTwoCoral(drivebase, elevator, intake);
+    // return new PivotToSetpoint(intake, 30)
+    //   .andThen(new Drive(drivebase, () -> new Transform2d(new Translation2d(1.5, 0), new Rotation2d())));
+    return new PivotToSetpoint(intake, 30)
+      .andThen(new LeftTwoCoral(drivebase, elevator, intake));
   }
 
   public void setMotorBrake(boolean brake) {
