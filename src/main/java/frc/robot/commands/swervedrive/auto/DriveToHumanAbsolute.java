@@ -31,7 +31,7 @@ public class DriveToHumanAbsolute extends SequentialCommandGroup {
                     new Translation2d(
                         robotXWidth + Units.inchesToMeters(1),
                         0
-                    ).unaryMinus().rotateBy(pose.getRotation().unaryMinus()), 
+                    ), 
                     Rotation2d.k180deg
                 ));
 
