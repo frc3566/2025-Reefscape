@@ -37,7 +37,7 @@ public class DriveToReefAbsoluteAuto extends SequentialCommandGroup implements W
                 var pose = Vision.getAprilTagPose(hexagonSide.getTargettingId(), new Transform2d());
                 targetPose = pose.transformBy(new Transform2d(
                     new Translation2d(
-                        robotXWidth + Units.inchesToMeters(2.5),
+                        robotXWidth + Units.inchesToMeters(1),
                         -ReefUtil.adjustY * multiplier
                     ), 
                     Rotation2d.k180deg

@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
@@ -28,7 +29,7 @@ public class DriveToHumanAbsolute extends SequentialCommandGroup {
 
                 targetPose = pose.transformBy(new Transform2d(
                     new Translation2d(
-                        robotXWidth,
+                        robotXWidth + Units.inchesToMeters(1),
                         0
                     ).unaryMinus().rotateBy(pose.getRotation().unaryMinus()), 
                     Rotation2d.k180deg
