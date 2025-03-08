@@ -4,41 +4,26 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.config.PIDConstants;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.GetCoral;
 import frc.robot.commands.ScoreCoral;
-import frc.robot.commands.elevator.ElevatorToSetpoint;
 import frc.robot.commands.intake.PivotToSetpoint;
 import frc.robot.commands.swervedrive.auto.DriveToReefAbsolute;
-import frc.robot.commands.swervedrive.auto.DriveToReefRelative;
-import frc.robot.commands.swervedrive.drivebase.AbsoluteDrive;
 import frc.robot.commands.swervedrive.drivebase.Drive;
-import frc.robot.commands.swervedrive.drivebase.Spin;
 import frc.robot.commands.vision.ReefUtil;
-import frc.robot.commands.vision.SupplyAprilTagRobotTransform;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -46,8 +31,6 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
 import java.io.File;
-import java.util.Set;
-import java.util.function.BooleanSupplier;
 
 import swervelib.SwerveInputStream;
 
@@ -264,29 +247,29 @@ public class RobotContainer {
         .and(driverXbox2.rightTrigger().negate())
         .and(driverXbox2.povLeft().negate())
         .and(driverXbox2.povRight().negate())
-        .onTrue(cancelSetpointCmd)
-        .onTrue(setpointCmd = new GetCoral(elevator, intake));
+        // .onTrue(cancelSetpointCmd)
+        .whileTrue(setpointCmd = new GetCoral(elevator, intake));
       driverXbox2.y()
         .and(driverXbox2.leftTrigger().negate())
         .and(driverXbox2.rightTrigger().negate())
         .and(driverXbox2.povLeft().negate())
         .and(driverXbox2.povRight().negate())
-        .onTrue(cancelSetpointCmd)
-        .onTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L4));
+        // .onTrue(cancelSetpointCmd)
+        .whileTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L4));
       driverXbox2.b()
         .and(driverXbox2.leftTrigger().negate())
         .and(driverXbox2.rightTrigger().negate())
         .and(driverXbox2.povLeft().negate())
         .and(driverXbox2.povRight().negate())
-        .onTrue(cancelSetpointCmd)
-        .onTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
+        // .onTrue(cancelSetpointCmd)
+        .whileTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
       driverXbox2.a()
         .and(driverXbox2.leftTrigger().negate())
         .and(driverXbox2.rightTrigger().negate())
         .and(driverXbox2.povLeft().negate())
         .and(driverXbox2.povRight().negate())
-        .onTrue(cancelSetpointCmd)
-        .onTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
+        // .onTrue(cancelSetpointCmd)
+        .whileTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
 
       driverXbox2.rightBumper().onTrue(cancelSetpointCmd);
 
@@ -295,28 +278,28 @@ public class RobotContainer {
       driverXbox2.x()
         .and(driverXbox2.leftTrigger())
         .and(driverXbox2.povDown())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSLEFT, ReefUtil.LeftRight.LEFT)
         );
 
       driverXbox2.b()
         .and(driverXbox2.leftTrigger())
         .and(driverXbox2.povDown())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSRIGHT, ReefUtil.LeftRight.LEFT)
         );
       
       driverXbox2.y()
         .and(driverXbox2.leftTrigger())
         .and(driverXbox2.povDown())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
         );
       
       driverXbox2.a()
         .and(driverXbox2.leftTrigger())
         .and(driverXbox2.povDown())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
         );
       
@@ -324,28 +307,28 @@ public class RobotContainer {
       driverXbox2.x()
         .and(driverXbox2.rightTrigger())
         .and(driverXbox2.povDown())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSLEFT, ReefUtil.LeftRight.RIGHT)
         );
 
       driverXbox2.b()
         .and(driverXbox2.rightTrigger())
         .and(driverXbox2.povDown())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSRIGHT, ReefUtil.LeftRight.RIGHT)
         );
       
       driverXbox2.y()
         .and(driverXbox2.rightTrigger())
         .and(driverXbox2.povDown())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.RIGHT)
         );
       
       driverXbox2.a()
         .and(driverXbox2.rightTrigger())
         .and(driverXbox2.povDown())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.RIGHT)
         );
       
@@ -355,28 +338,28 @@ public class RobotContainer {
       driverXbox2.x()
         .and(driverXbox2.leftTrigger())
         .and(driverXbox2.povUp())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGELEFT, ReefUtil.LeftRight.LEFT)
         );
 
       driverXbox2.b()
         .and(driverXbox2.leftTrigger())
         .and(driverXbox2.povUp())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGERIGHT, ReefUtil.LeftRight.LEFT)
         );
       
       driverXbox2.y()
         .and(driverXbox2.leftTrigger())
         .and(driverXbox2.povUp())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.LEFT)
         );
       
       driverXbox2.a()
         .and(driverXbox2.leftTrigger())
         .and(driverXbox2.povUp())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.LEFT)
         );
 
@@ -384,28 +367,28 @@ public class RobotContainer {
       driverXbox2.x()
         .and(driverXbox2.rightTrigger())
         .and(driverXbox2.povUp())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGELEFT, ReefUtil.LeftRight.RIGHT)
         );
 
       driverXbox2.b()
         .and(driverXbox2.rightTrigger())
         .and(driverXbox2.povUp())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGERIGHT, ReefUtil.LeftRight.RIGHT)
         );
       
       driverXbox2.y()
         .and(driverXbox2.rightTrigger())
         .and(driverXbox2.povUp())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.RIGHT)
         );
       
       driverXbox2.a()
         .and(driverXbox2.rightTrigger())
         .and(driverXbox2.povUp())
-        .onTrue(
+        .whileTrue(
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.RIGHT)
         );
 
