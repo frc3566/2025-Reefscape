@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.GetCoral;
 import frc.robot.commands.ScoreCoral;
+import frc.robot.commands.auto.LeftTwoCoral;
 import frc.robot.commands.intake.PivotToSetpoint;
 import frc.robot.commands.swervedrive.auto.DriveToReefAbsolute;
 import frc.robot.commands.swervedrive.drivebase.Drive;
@@ -411,8 +412,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     // return drivebase.getAutonomousCommand("New Auto");
-    return new PivotToSetpoint(intake, 30)
-      .andThen(new Drive(drivebase, () -> new Transform2d(new Translation2d(1.5, 0), new Rotation2d())));
+    return new LeftTwoCoral(drivebase, elevator, intake);
   }
 
   public void setMotorBrake(boolean brake) {

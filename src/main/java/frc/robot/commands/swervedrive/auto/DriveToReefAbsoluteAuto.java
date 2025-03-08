@@ -1,0 +1,62 @@
+package frc.robot.commands.swervedrive.auto;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.TargetingSystem;
+import frc.robot.Constants;
+import frc.robot.FieldConstants.Reef;
+import frc.robot.FieldConstants.ReefHeight;
+import frc.robot.commands.WithStatus;
+import frc.robot.commands.vision.ReefUtil;
+import frc.robot.commands.vision.SupplyAprilTagFieldPose;
+import frc.robot.commands.vision.ReefUtil.LeftRight;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Vision;
+
+import java.util.List;
+import java.util.Set;
+
+public class DriveToReefAbsoluteAuto extends SequentialCommandGroup implements WithStatus {
+    private List<Command> commandsWithStatus;
+    private Pose2d targetPose = new Pose2d();
+
+    public DriveToReefAbsoluteAuto(SwerveSubsystem swerve, ReefUtil.Side hexagonSide, ReefUtil.LeftRight side) {
+        double multiplier = side == LeftRight.LEFT ? 1 : -1;
+        double robotXWidth = Constants.Vision.xWidth;
+
+        commandsWithStatus = List.of(
+            new InstantCommand(() -> {
+                System.out.println("Going to AprilTag " + hexagonSide.getTargettingId());
+                var pose = Vision.getAprilTagPose(hexagonSide.getTargettingId(), new Transform2d());
+                targetPose = pose.transformBy(new Transform2d(
+                    new Translation2d(
+                        robotXWidth + Units.inchesToMeters(2.5),
+                        -ReefUtil.adjustY * multiplier
+                    ), 
+                    Rotation2d.k180deg
+                ));
+                
+                System.out.println("AprilTag pose: " + pose);
+
+                System.out.println(targetPose);
+            }),
+            new DeferredCommand(() -> swerve.driveToPose(targetPose), Set.of(swerve))
+        );
+
+        addCommands(
+            commandsWithStatus.toArray(Command[]::new)
+        );
+    }
+
+    @Override
+    public boolean isRunning() {
+        throw new RuntimeException("Not implemented");
+    }
+}
