@@ -398,6 +398,16 @@ public class RobotContainer {
       driverXbox2.povLeft().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
       driverXbox2.povLeft().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
+      driverXbox2.leftBumper().whileTrue(
+        drivebase.driveToPose(
+          drivebase.getPose()
+            .transformBy(new Transform2d(
+              new Translation2d(5, 5),
+              Rotation2d.fromDegrees(30)
+            ))
+        )
+      );
+
       // driverXbox2.x().whileTrue(
       //   new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
       // );
@@ -424,6 +434,7 @@ public class RobotContainer {
 
   public void updateSimulation() {
     if (!Robot.isSimulation()) { return; }
+    if (drivebase.vision == null) { return; }
     this.drivebase.vision.visionSim.update(this.drivebase.getPose());
   }
 }
