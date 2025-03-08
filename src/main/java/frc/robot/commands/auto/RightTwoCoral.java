@@ -27,7 +27,7 @@ public class RightTwoCoral extends SequentialCommandGroup{
     public RightTwoCoral(SwerveSubsystem swerve, Elevator elevator, Intake intake) {
         List<Command> cmds = List.of(
             new ParallelCommandGroup(
-                new DriveToReefAbsoluteAuto(swerve,ReefUtil.Side.BARGERIGHT, ReefUtil.LeftRight.RIGHT),
+                new DriveToReefAbsoluteAuto(swerve,ReefUtil.Side.BARGERIGHT, ReefUtil.LeftRight.LEFT),
                 new ScoreCoral(elevator, intake, ReefUtil.BranchLevel.L4)
             ),
             new InstantCommand(() -> intake.runIntake(false)),

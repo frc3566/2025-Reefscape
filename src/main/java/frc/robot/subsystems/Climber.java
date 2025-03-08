@@ -35,7 +35,7 @@ private SparkMaxConfig getMotorConfig(boolean isInverted) {
     // SparkMaxUtil.setSparkMaxBusUsage(driveMotor, Usage.kAll);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(60)
         .inverted(isInverted)
         .idleMode(IdleMode.kBrake);
     return motorConfig;

@@ -21,7 +21,9 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.GetCoral;
 import frc.robot.commands.ScoreCoral;
 import frc.robot.commands.auto.LeftTwoCoral;
+import frc.robot.commands.auto.RightTwoCoral;
 import frc.robot.commands.intake.PivotToSetpoint;
+import frc.robot.commands.swervedrive.auto.DriveToHumanAbsolute;
 import frc.robot.commands.swervedrive.auto.DriveToReefAbsolute;
 import frc.robot.commands.swervedrive.drivebase.Drive;
 import frc.robot.commands.vision.ReefUtil;
@@ -393,20 +395,19 @@ public class RobotContainer {
           new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.RIGHT)
         );
 
-      driverXbox2.povRight().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral out
-      driverXbox2.povRight().onFalse(new InstantCommand(() -> intake.stopIntake()));
-      driverXbox2.povLeft().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
-      driverXbox2.povLeft().onFalse(new InstantCommand(() -> intake.stopIntake()));
+      driverXbox2.povLeft().whileTrue(new DriveToHumanAbsolute(drivebase, ReefUtil.LeftRight.LEFT)); 
+      driverXbox2.povRight().whileTrue(new DriveToHumanAbsolute(drivebase, ReefUtil.LeftRight.RIGHT)); 
 
-      driverXbox2.leftBumper().whileTrue(
-        drivebase.driveToPose(
-          drivebase.getPose()
-            .transformBy(new Transform2d(
-              new Translation2d(5, 5),
-              Rotation2d.fromDegrees(30)
-            ))
-        )
-      );
+      // driverXbox2.leftBumper().whileTrue(
+      //   drivebase.driveToPose(
+      //     drivebase.getPose()
+      //       .transformBy(new Transform2d(
+      //         new Translation2d(2, 0),
+      //         Rotation2d.fromDegrees(30)
+      //       ))
+      //   )
+      // );
+      // driverXbox2.rightBumper().onTrue(new InstantCommand(() -> drivebase.resetOdometry(new Pose2d(new Translation2d(10, 4), new Rotation2d(0)))));
 
       // driverXbox2.x().whileTrue(
       //   new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
