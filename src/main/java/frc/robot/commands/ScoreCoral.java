@@ -16,13 +16,13 @@ public class ScoreCoral extends SequentialCommandGroup {
                 elevatorSetpoint = 1; intakeSetpoint = 2;
                 break;
             case L2:
-                elevatorSetpoint = 1.38; intakeSetpoint = 110;
+                elevatorSetpoint = 1.3; intakeSetpoint = 110;
                 break; 
             case L3:
-                elevatorSetpoint = 3.07; intakeSetpoint = 110;
+                elevatorSetpoint = 3; intakeSetpoint = 110;
                 break;
             case L4:
-                elevatorSetpoint = 4.83; intakeSetpoint = 92;
+                elevatorSetpoint = 4.83; intakeSetpoint = 90;
                 break;
         }
 

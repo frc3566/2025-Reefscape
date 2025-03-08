@@ -29,7 +29,7 @@ public class DriveToHumanAbsolute extends SequentialCommandGroup {
 
                 targetPose = pose.transformBy(new Transform2d(
                     new Translation2d(
-                        robotXWidth + Units.inchesToMeters(1),
+                        robotXWidth + Units.inchesToMeters(0.5),
                         0
                     ), 
                     Rotation2d.k180deg
