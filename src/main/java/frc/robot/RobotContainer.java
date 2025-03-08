@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -69,6 +70,8 @@ public class RobotContainer {
   private final Climber climber = new Climber();
   private final Elevator elevator = new Elevator();
   private final Intake intake = new Intake();
+
+  private Command setpointCmd = null;
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -250,34 +253,170 @@ public class RobotContainer {
       driverXbox.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
       driverXbox.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
-      driverXbox2.x().whileTrue(new GetCoral(elevator, intake));
-      driverXbox2.y().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L4));
-      driverXbox2.b().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
-      driverXbox2.a().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
-      // driverXbox2.povLeft().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.LEFT));
-      // driverXbox2.povRight().whileTrue(new DriveToReefRelative(this.drivebase, ReefUtil.LeftRight.RIGHT));
+      Command cancelSetpointCmd = new InstantCommand(() -> {
+        if (setpointCmd != null && setpointCmd.isScheduled()) {
+          setpointCmd.cancel();
+        }
+      });
 
-      driverXbox2.povUp().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral out
-      driverXbox2.povUp().onFalse(new InstantCommand(() -> intake.stopIntake()));
-      driverXbox2.povDown().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
-      driverXbox2.povDown().onFalse(new InstantCommand(() -> intake.stopIntake()));
+      driverXbox2.x()
+        .and(driverXbox2.leftTrigger().negate())
+        .and(driverXbox2.rightTrigger().negate())
+        .and(driverXbox2.povLeft().negate())
+        .and(driverXbox2.povRight().negate())
+        .onTrue(cancelSetpointCmd)
+        .onTrue(setpointCmd = new GetCoral(elevator, intake));
+      driverXbox2.y()
+        .and(driverXbox2.leftTrigger().negate())
+        .and(driverXbox2.rightTrigger().negate())
+        .and(driverXbox2.povLeft().negate())
+        .and(driverXbox2.povRight().negate())
+        .onTrue(cancelSetpointCmd)
+        .onTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L4));
+      driverXbox2.b()
+        .and(driverXbox2.leftTrigger().negate())
+        .and(driverXbox2.rightTrigger().negate())
+        .and(driverXbox2.povLeft().negate())
+        .and(driverXbox2.povRight().negate())
+        .onTrue(cancelSetpointCmd)
+        .onTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
+      driverXbox2.a()
+        .and(driverXbox2.leftTrigger().negate())
+        .and(driverXbox2.rightTrigger().negate())
+        .and(driverXbox2.povLeft().negate())
+        .and(driverXbox2.povRight().negate())
+        .onTrue(cancelSetpointCmd)
+        .onTrue(setpointCmd = new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L2));
 
-      // driverXbox2.povDown().and(driverXbox2.x()).onTrue(
-      //   new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSLEFT, ReefUtil.LeftRight.LEFT)
-      // );
+      driverXbox2.rightBumper().onTrue(cancelSetpointCmd);
+
+      /* ds side */
+      /* left */
+      driverXbox2.x()
+        .and(driverXbox2.leftTrigger())
+        .and(driverXbox2.povDown())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSLEFT, ReefUtil.LeftRight.LEFT)
+        );
+
+      driverXbox2.b()
+        .and(driverXbox2.leftTrigger())
+        .and(driverXbox2.povDown())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSRIGHT, ReefUtil.LeftRight.LEFT)
+        );
+      
+      driverXbox2.y()
+        .and(driverXbox2.leftTrigger())
+        .and(driverXbox2.povDown())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
+        );
+      
+      driverXbox2.a()
+        .and(driverXbox2.leftTrigger())
+        .and(driverXbox2.povDown())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
+        );
+      
+      /* right */
+      driverXbox2.x()
+        .and(driverXbox2.rightTrigger())
+        .and(driverXbox2.povDown())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSLEFT, ReefUtil.LeftRight.RIGHT)
+        );
+
+      driverXbox2.b()
+        .and(driverXbox2.rightTrigger())
+        .and(driverXbox2.povDown())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.DSRIGHT, ReefUtil.LeftRight.RIGHT)
+        );
+      
+      driverXbox2.y()
+        .and(driverXbox2.rightTrigger())
+        .and(driverXbox2.povDown())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.RIGHT)
+        );
+      
+      driverXbox2.a()
+        .and(driverXbox2.rightTrigger())
+        .and(driverXbox2.povDown())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.RIGHT)
+        );
+      
+
+      /* barge side */
+      /* left */
+      driverXbox2.x()
+        .and(driverXbox2.leftTrigger())
+        .and(driverXbox2.povUp())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGELEFT, ReefUtil.LeftRight.LEFT)
+        );
+
+      driverXbox2.b()
+        .and(driverXbox2.leftTrigger())
+        .and(driverXbox2.povUp())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGERIGHT, ReefUtil.LeftRight.LEFT)
+        );
+      
+      driverXbox2.y()
+        .and(driverXbox2.leftTrigger())
+        .and(driverXbox2.povUp())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.LEFT)
+        );
+      
+      driverXbox2.a()
+        .and(driverXbox2.leftTrigger())
+        .and(driverXbox2.povUp())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.LEFT)
+        );
+
+      /* right */
+      driverXbox2.x()
+        .and(driverXbox2.rightTrigger())
+        .and(driverXbox2.povUp())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGELEFT, ReefUtil.LeftRight.RIGHT)
+        );
+
+      driverXbox2.b()
+        .and(driverXbox2.rightTrigger())
+        .and(driverXbox2.povUp())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGERIGHT, ReefUtil.LeftRight.RIGHT)
+        );
+      
+      driverXbox2.y()
+        .and(driverXbox2.rightTrigger())
+        .and(driverXbox2.povUp())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.RIGHT)
+        );
+      
+      driverXbox2.a()
+        .and(driverXbox2.rightTrigger())
+        .and(driverXbox2.povUp())
+        .onTrue(
+          new DriveToReefAbsolute(drivebase, ReefUtil.Side.BARGE, ReefUtil.LeftRight.RIGHT)
+        );
+
+      driverXbox2.povRight().onTrue(new InstantCommand(() -> intake.runIntake(false))); //coral out
+      driverXbox2.povRight().onFalse(new InstantCommand(() -> intake.stopIntake()));
+      driverXbox2.povLeft().onTrue(new InstantCommand(() -> intake.runIntake(true))); // coral in
+      driverXbox2.povLeft().onFalse(new InstantCommand(() -> intake.stopIntake()));
 
       // driverXbox2.x().whileTrue(
       //   new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
       // );
-
-      driverXbox2.povLeft().whileTrue(
-        new DriveToReefAbsolute(drivebase, ReefUtil.Side.DS, ReefUtil.LeftRight.LEFT)
-      );
-
-      // driverXbox.povUpRight().whileTrue(new ElevatorToSetpoint(elevator, 0.66));
-      // driverXbox.povUpLeft().whileTrue(new GetCoral(elevator, intake));
-      // driverXbox.povDownLeft().whileTrue(new ScoreCoral(elevator, intake, ReefUtil.BranchLevel.L2));
-      // driverXbox.povDownRight().whileTrue(new ScoreCoral(elevator, intake , ReefUtil.BranchLevel.L3));
     }
   }
 
